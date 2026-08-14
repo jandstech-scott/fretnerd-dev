@@ -77,6 +77,15 @@
       <div class="module-badge badge-soon">Coming soon</div>
     </div>
 
+    <button class="module-card available" onclick="launchModule('beat')">
+      <div class="module-icon">06</div>
+      <div class="module-info">
+        <div class="module-name">Beat &amp; Timing</div>
+        <div class="module-desc">Feel the beat, subdivide it, read it, then strum it. Own your timing.</div>
+      </div>
+      <div class="module-badge badge-demo">Early Demo</div>
+    </button>
+
   </div>
 
   <div class="home-footer">
@@ -367,6 +376,30 @@
 <script src="js/triads-data.js"></script>
 <script src="js/triads-shell.js"></script>
 <script src="js/triads-engine.js"></script>
+<script src="js/beat-data.js"></script>
+<script src="js/beat-clock.js"></script>
+<script src="js/beat-visuals.js"></script>
+<script src="js/beat-engine.js"></script>
+<script src="js/beat-stage1.js"></script>
+<script src="js/beat-stage2.js"></script>
+<script src="js/beat-stage3.js"></script>
+<script src="js/beat-stage4.js"></script>
+<script src="js/beat-shell.js"></script>
+
+<!-- Beat & Timing first-launch tour (forked from the main tour-overlay,
+     isolated ids so it never conflicts with Fretboard Notes' tour) -->
+<div id="beat-tour-overlay">
+  <div class="tour-panel">
+    <div class="tour-icon" id="beat-tour-icon">🥁</div>
+    <div class="tour-title" id="beat-tour-title">Welcome to Beat &amp; Timing</div>
+    <div class="tour-body" id="beat-tour-body"></div>
+    <div class="tour-dots" id="beat-tour-dots"></div>
+    <div class="tour-btns">
+      <button class="tour-skip" id="beat-tour-skip-btn" onclick="endBeatTour()">Skip</button>
+      <button class="tour-next" id="beat-tour-next-btn" onclick="beatTourNext()">Next →</button>
+    </div>
+  </div>
+</div>
 
 <!-- Triads help overlay -->
 <div id="triads-help-overlay" onclick="if(event.target===this)closeTriadsHelp()" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;padding:16px;">

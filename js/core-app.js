@@ -1332,6 +1332,7 @@ function showHome() {
   if (currentModule === 'fundamentals') exitFundamentals();
   if (currentModule === 'chords') exitChords();
   if (currentModule === 'triads') exitTriads();
+  if (currentModule === 'beat') exitBeat();
   el('home-screen').classList.add('show');
   el('app').style.display = 'none';
   ['settings-overlay','stats-overlay','complete-overlay','countdown-overlay']
@@ -1451,6 +1452,8 @@ function launchModule(id) {
     launchChords();
   } else if (id === 'triads') {
     launchTriads();
+  } else if (id === 'beat') {
+    launchBeat();
   } else if (id === 'fundamentals') {
     currentModule = 'fundamentals';
     el('app').classList.add('simple-module');

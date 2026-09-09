@@ -78,7 +78,7 @@ function triadsRenderPracticeQ() {
         '<div style="font-size:11px;color:var(--text2);margin-top:2px;">' + q.sub + '</div>' +
       '</div>' +
       '<div class="fund-lesson-card" style="padding:8px;">' +
-        '<canvas id="triads-canvas" style="display:block;width:100%;cursor:pointer;"></canvas>' +
+        '<div id="triads-fb-outer" style="cursor:pointer;"><div id="triads-board" class="fb-board"></div></div>' +
       '</div>' +
       '<div id="triadsFB" style="text-align:center;font-size:13px;color:var(--text3);padding:4px 0;">Tap each string to place the notes</div>' +
     '</div>';
@@ -86,9 +86,9 @@ function triadsRenderPracticeQ() {
   triadsDrawBuildCanvas(q.shape, [], null);
   triadsUpdateStats();
 
-  var canvas = el('triads-canvas');
-  canvas.addEventListener('click', triadsHandleBuildTap);
-  canvas.addEventListener('touchend', triadsHandleBuildTapTouch, { passive: false });
+  var outer = el('triads-fb-outer');
+  outer.addEventListener('click', triadsHandleBuildTap);
+  outer.addEventListener('touchend', triadsHandleBuildTapTouch, { passive: false });
 }
 
 function triadsGenQuestion() {
@@ -112,30 +112,27 @@ function triadsGenQuestion() {
   };
 }
 
-/* Map a click/touch event to (stringIdx, fret) and place a dot */
+/* Map a click/touch event to (stringIdx, fret) and place a dot.
+   Uses fbClientToBoardXY (js/fretboard-renderer.js) for the pixel→board-
+   local conversion — the same plumbing fbHitTest uses — but snaps to the
+   nearest of the shape's own 3 strings rather than the nearest of all,
+   since only those 3 are tappable here. This also means taps resolve
+   correctly under left-handed mirroring for free: xForFret/yForString
+   already produced the (possibly mirrored) dot positions the player sees,
+   and fretForX/yForString invert that same transform here. */
 function triadsHandleBuildTap(e) {
-  if (TRIAD_BUILD.validated || !TRIADS_BUILD_GEOMETRY) return;
-  var g      = TRIADS_BUILD_GEOMETRY;
-  var canvas = el('triads-canvas');
-  if (!canvas) return;
+  if (TRIAD_BUILD.validated) return;
+  var pt = fbClientToBoardXY('triads-fb-outer', e.clientX, e.clientY);
+  if (!pt) return;
+  var geom = pt.geom;
 
-  var rect   = canvas.getBoundingClientRect();
-  var scaleX = parseFloat(canvas.style.width)  / rect.width;
-  var scaleY = parseFloat(canvas.style.height) / rect.height;
-  var x = (e.clientX - rect.left) * scaleX;
-  var y = (e.clientY - rect.top)  * scaleY;
+  var activeStrings = TRIAD_QUIZ.currentQ.shape.strings;
+  var stringIdx = activeStrings.reduce(function(best, s) {
+    return Math.abs(pt.y - yForString(s, geom)) < Math.abs(pt.y - yForString(best, geom)) ? s : best;
+  }, activeStrings[0]);
 
-  /* Snap y → nearest active string */
-  var stringIdx = g.strings.reduce(function(best, s) {
-    return Math.abs(y - (g.PT + s * g.sh)) < Math.abs(y - (g.PT + best * g.sh)) ? s : best;
-  }, g.strings[0]);
-
-  /* Map x → fret number */
-  var boardX = x - g.PL - g.zoneMargin;
-  if (boardX < 0) return;
-  var k = Math.floor(boardX / g.fw) + 1;
-  if (k < 1 || k > g.numFrets) return;
-  var fret = g.loW + k;
+  var fret = fretForX(pt.x, geom);
+  if (fret < geom.fretLo || fret > geom.fretHi) return;
 
   triadsBuildPlace(stringIdx, fret);
 }

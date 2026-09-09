@@ -24,11 +24,25 @@
   <div class="home-title"><span class="fret-word">Fret</span><span class="nerd-word">Nerd</span></div>
   <div class="home-tagline">Nerd out. Play better.</div>
 
-  <!-- instrument toggle -->
-  <div class="inst-toggle" style="margin-bottom:20px;">
-    <button id="inst-guitar" class="inst-btn active" onclick="selectInstrument('guitar')">🎸 Guitar</button>
-    <button id="inst-bass"   class="inst-btn"        onclick="selectInstrument('bass')">🎵 Bass</button>
+  <!-- instrument + handedness toggles -->
+  <div class="toggle-row">
+    <div class="toggle-group">
+      <div class="toggle-label">Instrument</div>
+      <div class="inst-toggle">
+        <button id="inst-guitar" class="inst-btn active" onclick="selectInstrument('guitar')">🎸 Guitar</button>
+        <button id="inst-bass"   class="inst-btn"        onclick="selectInstrument('bass')">🎵 Bass</button>
+      </div>
+    </div>
+    <div class="toggle-group">
+      <div class="toggle-label">Guitar Direction</div>
+      <div class="inst-toggle">
+        <button id="hand-right" class="inst-btn active" onclick="selectHandedness('right')">Right</button>
+        <button id="hand-left"  class="inst-btn"        onclick="selectHandedness('left')">Left</button>
+      </div>
+    </div>
   </div>
+
+  <div id="setup-confirm" class="setup-confirm"></div>
 
   <div class="module-grid">
 
@@ -178,7 +192,7 @@
   <!-- study content (shown when Study tab active) -->
   <div id="study-content" style="display:none;flex:1;flex-direction:column;gap:var(--gap);min-height:0;">
     <div id="study-fb-outer" style="flex-shrink:0;">
-      <canvas id="study-canvas"></canvas>
+      <div id="study-board" class="fb-board"></div>
     </div>
     <div id="study-legend" style="flex-shrink:0;display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--text2);background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;"></div>
     <button id="study-start-btn" onclick="switchTab('practice');startPracticeSession();"
@@ -201,7 +215,7 @@
       </div>
     </div>
     <div id="fb-outer">
-      <canvas id="fb-canvas"></canvas>
+      <div id="fb-board" class="fb-board"></div>
       <div id="pause-cover">
         <div style="font-size:18px;font-weight:600;color:var(--text3);">Paused</div>
         <button onclick="togglePause()" style="margin-top:8px;padding:10px 24px;font-size:14px;font-weight:600;background:var(--teal);color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:8px;">
@@ -355,6 +369,7 @@
 </div>
 
 <script src="js/core-app.js"></script>
+<script src="js/fretboard-renderer.js"></script>
 <script src="js/fundamentals-data.js"></script>
 <script src="js/fundamentals-engine.js"></script>
 <script src="js/fundamentals-shell.js"></script>

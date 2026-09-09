@@ -55,28 +55,39 @@ function fundBuildStringSVG(showStepLabels, showAllNotes) {
   var accidentalFill = 'rgba(102,102,102,0.22)';
   var accidentalText = '#666';
 
+  /* This is a single-string diagram, not the multi-string fretboard component
+     (js/fretboard-renderer.js) \u2014 it has no string axis to mirror, only the
+     fret axis. xF(f) mirrors fret position around [nutX, endX] when the
+     player has chosen left-handed, same "nut moves to the other edge, fret
+     numbers count down" treatment as the real fretboard (spec 2.5). */
+  var mirror = leftHanded;
+  function xF(f) {
+    var x = nutX + f * fretSpacing;
+    return mirror ? (nutX + endX - x) : x;
+  }
+
   var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" style="display:block;">';
-  svg += '<rect x="' + (nutX - 3) + '" y="' + (stringY - 8) + '" width="4" height="16" rx="1" fill="#999" opacity="0.5"/>';
+  svg += '<rect x="' + (xF(0) - 3) + '" y="' + (stringY - 8) + '" width="4" height="16" rx="1" fill="#999" opacity="0.5"/>';
 
   for (var f = 0; f <= fretCount; f++) {
-    var x = nutX + f * fretSpacing;
+    var x = xF(f);
     var isHalf = (f === 1 || f === 8);
     svg += '<line x1="' + x + '" y1="' + (stringY - 8) + '" x2="' + x + '" y2="' + (stringY + 8) + '" stroke="' + (isHalf ? teal : 'rgba(102,102,102,0.18)') + '" stroke-width="' + (isHalf ? 1.5 : 1) + '"/>';
   }
 
-  svg += '<line x1="' + nutX + '" y1="' + stringY + '" x2="' + endX + '" y2="' + stringY + '" stroke="' + stringColor + '" stroke-width="2"/>';
+  svg += '<line x1="' + xF(0) + '" y1="' + stringY + '" x2="' + xF(fretCount) + '" y2="' + stringY + '" stroke="' + stringColor + '" stroke-width="2"/>';
 
   for (var f2 = 0; f2 <= fretCount; f2++) {
-    var x2 = nutX + f2 * fretSpacing;
+    var x2 = xF(f2);
     svg += '<text x="' + x2 + '" y="' + (stringY + 20) + '" text-anchor="middle" font-size="9" fill="' + textMuted + '">' + f2 + '</text>';
   }
 
-  svg += '<text x="' + (nutX - 18) + '" y="' + (stringY + 4) + '" text-anchor="middle" font-size="12" font-weight="700" fill="' + textMuted + '">E</text>';
+  svg += '<text x="' + (xF(0) + (mirror ? 18 : -18)) + '" y="' + (stringY + 4) + '" text-anchor="middle" font-size="12" font-weight="700" fill="' + textMuted + '">E</text>';
 
   var notesToShow = showAllNotes ? FUND_FRET_NOTES : FUND_FRET_NATURALS;
   for (var i = 0; i < notesToShow.length; i++) {
     var fn = notesToShow[i];
-    var x3 = nutX + fn.fret * fretSpacing;
+    var x3 = xF(fn.fret);
     var isNat = showAllNotes ? fn.natural : true;
     var fill = isNat ? teal : accidentalFill;
     var txtFill = isNat ? '#fff' : accidentalText;
@@ -92,7 +103,7 @@ function fundBuildStringSVG(showStepLabels, showAllNotes) {
       var b2 = FUND_FRET_NATURALS[n + 1];
       var gap = b2.fret - a2.fret;
       var label = gap === 1 ? 'H' : 'W';
-      var mx2 = nutX + ((a2.fret + b2.fret) / 2) * fretSpacing;
+      var mx2 = (xF(a2.fret) + xF(b2.fret)) / 2;
       svg += '<text x="' + mx2 + '" y="' + (stringY + 34) + '" text-anchor="middle" font-size="10" font-weight="800" fill="' + (gap === 1 ? teal : 'rgba(102,102,102,0.5)') + '">' + label + '</text>';
     }
   } else if (!showAllNotes) {
@@ -101,7 +112,7 @@ function fundBuildStringSVG(showStepLabels, showAllNotes) {
     for (var p = 0; p < pairs.length; p++) {
       var a = FUND_FRET_NATURALS[pairs[p][0]];
       var b = FUND_FRET_NATURALS[pairs[p][1]];
-      var mx = nutX + ((a.fret + b.fret) / 2) * fretSpacing;
+      var mx = (xF(a.fret) + xF(b.fret)) / 2;
       svg += '<text x="' + mx + '" y="' + (stringY + 34) + '" text-anchor="middle" font-size="9" font-weight="700" fill="' + teal + '">\u00BD</text>';
     }
   }

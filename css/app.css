@@ -34,6 +34,30 @@
       --gap:      8px;
       --pad:      10px 14px;
       --font:     -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+      /* fretboard renderer — always dark board (2.1a), swappable dot colors (3.1 open) */
+      --fb-board:      #111110;
+      --fb-fret:       #6B5C39;
+      --fb-string:     #7A8E9A;
+      --fb-marker:     #E6D9B8;
+      --fb-nut-fill:   #EEE3C8;
+      --fb-nut-stroke: #B8A47A;
+      --fb-label:      #999999;
+      --fb-dot-unanswered: var(--teal);
+      --fb-dot-correct:    var(--teal);
+      --fb-dot-wrong:       var(--red);
+      --fb-dot-wrong-badge: #791F1F;
+      --fb-dot-natural:    #1D9E75;
+      --fb-dot-accidental: #6C5CE7;
+      --fb-dot-text:       #ffffff;
+
+      /* Triad Positions — role-colored dots, ported unchanged from the old
+         TRIAD_COLOR_ROOT/THIRD/FIFTH canvas constants */
+      --fb-dot-triad-root:    #1D9E75;
+      --fb-dot-triad-third:   #6C5CE7;
+      --fb-dot-triad-fifth:   #BA7517;
+      --fb-dot-triad-neutral: #666666;
+      --fb-dot-triad-wrong:   #e53e3e;
     }
     @media (prefers-color-scheme: dark) {
       :root {
@@ -607,7 +631,7 @@
       overflow: hidden; position: relative;
       flex: 1; min-height: 80px;
     }
-    #fb-canvas { display: block; max-width: 100%; }
+    .fb-board svg { display: block; width: 100%; height: auto; }
     #pause-cover {
       display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
       background: var(--surface); border-radius: var(--radius);
@@ -700,7 +724,6 @@
       background: var(--surface); border: 1px solid var(--border);
       border-radius: var(--radius); padding: 6px 4px; overflow: hidden;
     }
-    #study-canvas { display: block; max-width: 100%; }
     #study-legend {
       flex-shrink: 0; display: flex; gap: 16px; flex-wrap: wrap;
       font-size: 12px; color: var(--text2);
@@ -813,11 +836,25 @@
       color: var(--hs-inlay2); margin-bottom: 28px;
     }
 
-    /* Instrument toggle */
+    /* Instrument + handedness toggles, side by side on one line */
+    .toggle-row {
+      display: flex; gap: 8px; width: 100%; max-width: 480px;
+      margin-bottom: 8px; flex-shrink: 0;
+    }
+    .toggle-group { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+    .toggle-label {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      font-family: 'Barlow Condensed', -apple-system, sans-serif;
+      color: var(--hs-copper); padding-left: 1px;
+    }
+    .setup-confirm {
+      width: 100%; max-width: 480px; text-align: center;
+      font-size: 0.8rem; color: var(--hs-inlay2);
+      margin-bottom: 20px; flex-shrink: 0;
+    }
     .inst-toggle {
-      display: flex; width: 100%; max-width: 480px;
+      display: flex; overflow: hidden;
       border: 1px solid var(--hs-fret); border-radius: 2px;
-      overflow: hidden; margin-bottom: 0; flex-shrink: 0;
       background: var(--hs-ebony); /* screen — hides dots behind toggle */
     }
     .inst-btn {

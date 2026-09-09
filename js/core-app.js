@@ -33,6 +33,7 @@ var STRING_NAMES  = inst().stringNames;
 var NUM_STRINGS   = inst().strings;
 var MAX_FRET      = 21;
 var NECK_ASPECT   = 6.5;
+var leftHanded    = false;             // fretboard-renderer.js reads this as its default orientation
 
 /* experience level config */
 var EXP = {
@@ -142,6 +143,7 @@ function saveState() {
     snapshotCurrentInstrument();
     storage.setItem(SAVE_KEY, JSON.stringify({
       instrument: instrument,
+      leftHanded: leftHanded,
       instState:  instState
     }));
   } catch(e) {}
@@ -180,6 +182,7 @@ function loadState() {
     var id = d.instrument || 'guitar';
     applyInstrument(id);
     restoreInstrumentState(id);
+    leftHanded = !!d.leftHanded;
   } catch(e) {}
 }
 
@@ -326,234 +329,9 @@ function activeTotal() { return activeKeys().length; }
 /* ═══════════════════════════════════════════════════════════════
    SECTION 7: CANVAS RENDERING
 ═══════════════════════════════════════════════════════════════ */
-function drawFretboard(containerId, canvasId, targetS, targetF, revealNote, isWrong) {
-  var outer  = el(containerId);
-  var canvas = el(canvasId);
-  if (!outer || !canvas) return;
-
-  /* on portrait phone, show only the zone containing the target fret */
-  var fretLo = 0, fretHi = MAX_FRET;
-  if (containerId === 'fb-outer' && isPhonePortrait()) {
-    var bounds = phoneZoneBounds(targetF);
-    fretLo = bounds.lo; fretHi = bounds.hi;
-  }
-  var FRETS = fretHi - fretLo;
-
-  var aW = outer.clientWidth - 8;
-  if (aW <= 10) aW = window.innerWidth - 8;
-
-  var cW, cH;
-  if (isPhonePortrait() && containerId === 'fb-outer' && FRETS < MAX_FRET) {
-    /* fill width, taller aspect since fewer frets shown — scale factor tuned for readability */
-    var zoneAspect = NECK_ASPECT * (FRETS / MAX_FRET) * 1.6;
-    cW = Math.max(200, Math.floor(aW));
-    cH = Math.max(80,  Math.floor(cW / zoneAspect));
-  } else {
-    cW = Math.max(200, Math.floor(aW));
-    cH = Math.max(40,  Math.floor(cW / NECK_ASPECT));
-  }
-  var dpr = window.devicePixelRatio || 1;
-  canvas.width  = Math.round(cW * dpr);
-  canvas.height = Math.round(cH * dpr);
-  canvas.style.width  = cW + 'px';
-  canvas.style.height = cH + 'px';
-  var ctx = canvas.getContext('2d');
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.clearRect(0, 0, cW, cH);
-  var dark = isDark();
-
-  var PL = Math.round(cW * 0.042), PR = Math.round(cW * 0.012);
-  var PT = Math.round(cH * 0.12),  PB = Math.round(cH * 0.22);
-  var fw = (cW - PL - PR) / FRETS;
-  var sh = (cH - PT - PB) / (NUM_STRINGS - 1);
-
-  /* board background */
-  /* when showing a zone (fretLo > 0), add a small left margin so the
-     first fret line doesn't sit flush against the board edge (looks like a nut) */
-  var zoneMargin = (fretLo > 0) ? Math.round(fw * 0.4) : 0;
-  ctx.fillStyle = dark ? '#1e1400' : '#f9f4e8';
-  ctx.fillRect(PL, PT, zoneMargin + FRETS * fw, (NUM_STRINGS-1) * sh);
-
-  /* fret lines — offset by fretLo; nut only when fretLo === 0 */
-  for (var f = 0; f <= FRETS; f++) {
-    var x = PL + zoneMargin + f * fw;
-    var isNut = (fretLo === 0 && f === 0);
-    ctx.strokeStyle = isNut ? (dark ? '#bbb' : '#333') : (dark ? '#3a3a3a' : '#ddd');
-    ctx.lineWidth   = isNut ? Math.max(3, fw * 0.12) : 1;
-    ctx.beginPath(); ctx.moveTo(x, PT); ctx.lineTo(x, PT + (NUM_STRINGS-1) * sh); ctx.stroke();
-  }
-
-  /* strings — extend from left edge through all frets */
-  for (var s = 0; s < NUM_STRINGS; s++) {
-    var y = PT + s * sh;
-    ctx.strokeStyle = dark ? '#4a4a4a' : '#c8c8c8';
-    ctx.lineWidth   = Math.max(0.5, 0.5 + s * 0.35);
-    ctx.beginPath(); ctx.moveTo(PL, y); ctx.lineTo(PL + zoneMargin + FRETS * fw, y); ctx.stroke();
-  }
-
-  /* position dots — offset by fretLo and zoneMargin */
-  var dr = Math.max(3, Math.min(sh * 0.22, fw * 0.18));
-  [3,5,7,9,12,15,17,19].forEach(function(fd) {
-    var fi = fd - fretLo;
-    if (fi <= 0 || fi > FRETS) return;
-    var x = PL + zoneMargin + (fi - 0.5) * fw;
-    ctx.fillStyle = dark ? '#3a3a3a' : '#e0e0e0';
-    if (fd === 12) {
-      ctx.beginPath(); ctx.arc(x, PT + (NUM_STRINGS-1)*sh*0.3, dr, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(x, PT + (NUM_STRINGS-1)*sh*0.7, dr, 0, Math.PI * 2); ctx.fill();
-    } else {
-      ctx.beginPath(); ctx.arc(x, PT + (NUM_STRINGS-1)*sh*0.5, dr, 0, Math.PI * 2); ctx.fill();
-    }
-  });
-
-  /* fret number labels for phone portrait zone */
-  if (isPhonePortrait() && containerId === 'fb-outer') {
-    ctx.font = Math.max(9, Math.min(12, fw * 0.4)) + 'px -apple-system,sans-serif';
-    ctx.fillStyle = dark ? '#ccc' : '#444';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
-    for (var fn = fretLo; fn <= fretHi; fn++) {
-      var fi2 = fn - fretLo;
-      var fx = PL + zoneMargin + (fi2 === 0 ? 0 : (fi2 - 0.5) * fw);
-      if (fn === fretLo) fx = PL + zoneMargin * 0.5; /* center in the margin area */
-      ctx.fillText(fn, fx, PT + (NUM_STRINGS - 1) * sh + PB * 0.45);
-    }
-  }
-
-  /* string number labels */
-  var lc = dark ? '#555' : '#bbb';
-  ctx.font = Math.max(9, Math.min(12, sh * 0.55)) + 'px -apple-system,sans-serif';
-  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-  for (var s2 = 0; s2 < NUM_STRINGS; s2++) {
-    ctx.fillStyle = lc;
-    ctx.fillText(s2 + 1, PL - 5, PT + s2 * sh);
-  }
-
-  /* note dot — offset by fretLo and zoneMargin */
-  var hx = (targetF === 0 && fretLo === 0)
-    ? PL
-    : PL + zoneMargin + (targetF - fretLo - 0.5) * fw;
-  var hy = PT + targetS * sh;
-  var hr = Math.max(7, Math.min(sh * 0.44, fw * 0.36));
-  ctx.fillStyle = revealNote ? (isWrong ? '#E24B4A' : '#1D9E75') : '#1D9E75';
-  ctx.beginPath(); ctx.arc(hx, hy, hr, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#fff';
-  ctx.font = '600 ' + Math.max(9, hr * 0.9) + 'px -apple-system,sans-serif';
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText(revealNote || '?', hx, hy);
-  ctx.textBaseline = 'alphabetic';
-}
-
-/* study fretboard: shows note labels on selected positions, full neck visible */
-function drawStudyFretboard(activeStrings, fMin, fMax) {
-  var outer  = el('study-fb-outer');
-  var canvas = el('study-canvas');
-  if (!outer || !canvas) return;
-
-  var aW = outer.clientWidth - 8;
-  if (aW <= 10) aW = window.innerWidth - 8;
-
-  var cW = Math.max(200, Math.floor(aW));
-  var cH = Math.max(40,  Math.floor(cW / NECK_ASPECT));
-  var dpr = window.devicePixelRatio || 1;
-  canvas.width  = Math.round(cW * dpr);
-  canvas.height = Math.round(cH * dpr);
-  canvas.style.width  = cW + 'px';
-  canvas.style.height = cH + 'px';
-  var ctx = canvas.getContext('2d');
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.clearRect(0, 0, cW, cH);
-  var dark = isDark();
-
-  var PL = Math.round(cW * 0.042), PR = Math.round(cW * 0.012);
-  var PT = Math.round(cH * 0.12),  PB = Math.round(cH * 0.22);
-  var fw = (cW - PL - PR) / MAX_FRET;
-  var sh = (cH - PT - PB) / (NUM_STRINGS - 1);
-
-  /* board background */
-  ctx.fillStyle = dark ? '#1e1400' : '#f9f4e8';
-  ctx.fillRect(PL, PT, MAX_FRET * fw, (NUM_STRINGS - 1) * sh);
-
-  /* fret lines */
-  for (var f = 0; f <= MAX_FRET; f++) {
-    var x = PL + f * fw;
-    ctx.strokeStyle = (f === 0) ? (dark ? '#bbb' : '#333') : (dark ? '#3a3a3a' : '#ddd');
-    ctx.lineWidth   = (f === 0) ? Math.max(3, fw * 0.12) : 1;
-    ctx.beginPath(); ctx.moveTo(x, PT); ctx.lineTo(x, PT + (NUM_STRINGS - 1) * sh); ctx.stroke();
-  }
-
-  /* strings */
-  for (var s = 0; s < NUM_STRINGS; s++) {
-    var y = PT + s * sh;
-    ctx.strokeStyle = dark ? '#4a4a4a' : '#c8c8c8';
-    ctx.lineWidth   = Math.max(0.5, 0.5 + s * 0.35);
-    ctx.beginPath(); ctx.moveTo(PL, y); ctx.lineTo(PL + MAX_FRET * fw, y); ctx.stroke();
-  }
-
-  /* position marker dots */
-  var dr = Math.max(3, Math.min(sh * 0.22, fw * 0.18));
-  [3,5,7,9,12,15,17,19].forEach(function(fd) {
-    if (fd > MAX_FRET) return;
-    var mx = PL + (fd - 0.5) * fw;
-    ctx.fillStyle = dark ? '#3a3a3a' : '#e0e0e0';
-    if (fd === 12) {
-      ctx.beginPath(); ctx.arc(mx, PT + (NUM_STRINGS-1)*sh*0.3, dr, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(mx, PT + (NUM_STRINGS-1)*sh*0.7, dr, 0, Math.PI * 2); ctx.fill();
-    } else {
-      ctx.beginPath(); ctx.arc(mx, PT + (NUM_STRINGS-1)*sh*0.5, dr, 0, Math.PI * 2); ctx.fill();
-    }
-  });
-
-  /* string number labels */
-  ctx.font = Math.max(9, Math.min(12, sh * 0.55)) + 'px -apple-system,sans-serif';
-  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-  ctx.fillStyle = dark ? '#555' : '#bbb';
-  for (var s2 = 0; s2 < NUM_STRINGS; s2++) {
-    ctx.fillText(s2 + 1, PL - 5, PT + s2 * sh);
-  }
-
-  /* fret number labels (odd frets) */
-  ctx.font = Math.max(8, Math.min(11, fw * 0.38)) + 'px -apple-system,sans-serif';
-  ctx.fillStyle = dark ? '#888' : '#999';
-  ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
-  for (var fn = 1; fn <= MAX_FRET; fn++) {
-    if (fn % 2 === 1) {
-      ctx.fillText(fn, PL + (fn - 0.5) * fw, PT + (NUM_STRINGS - 1) * sh + PB * 0.55);
-    }
-  }
-
-  /* note dots for in-range positions */
-  var hr = Math.max(7, Math.min(sh * 0.44, fw * 0.36));
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  for (var si = 0; si < NUM_STRINGS; si++) {
-    if (activeStrings.indexOf(si) < 0) continue;
-    for (var fi = 0; fi <= MAX_FRET; fi++) {
-      if (fi < fMin || fi > fMax) continue;
-      var idx = chromIdx(si, fi);
-      if (!idxAllowed(idx)) continue;
-      var isAcc = ACCIDENTAL_IDX.indexOf(idx) >= 0;
-      var nx = (fi === 0) ? PL : PL + (fi - 0.5) * fw;
-      var ny = PT + si * sh;
-      ctx.fillStyle = isAcc ? '#6C5CE7' : '#1D9E75';
-      ctx.beginPath(); ctx.arc(nx, ny, hr, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#fff';
-      ctx.font = '600 ' + Math.max(7, Math.round(hr * 0.85)) + 'px -apple-system,sans-serif';
-      ctx.fillText(spellNote(idx), nx, ny);
-    }
-  }
-
-  var accSpan = (accHasSharps(accidentalMode) || accHasFlats(accidentalMode))
-    ? '<span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#6C5CE7;margin-right:5px;vertical-align:middle;"></span>Accidental</span>'
-    : '';
-  var HINT_SVG = '<svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="vertical-align:middle;margin:0 1px"><line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/><circle cx="7" cy="5" r="2" fill="var(--surface)"/><circle cx="13" cy="10" r="2" fill="var(--surface)"/><circle cx="7" cy="15" r="2" fill="var(--surface)"/></svg>';
-  var summarySpan = '<span style="margin-left:auto;text-align:right;line-height:1.5;">'
-    + buildSettingsSummary()
-    + '<br><span style="font-size:14px;">Tap ' + HINT_SVG + ' to change</span>'
-    + '</span>';
-  el('study-legend').innerHTML =
-    '<span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#1D9E75;margin-right:5px;vertical-align:middle;"></span>Natural</span> '
-    + accSpan + summarySpan;
-}
-
+/* drawFretboard/drawStudyFretboard retired — replaced by the shared
+   SVG component in js/fretboard-renderer.js (renderPracticeFretboard /
+   renderStudyFretboard). drawHeatmap stays canvas-based. */
 function drawHeatmap(canvasId) {
   var canvas = el(canvasId);
   if (!canvas) return;
@@ -679,10 +457,10 @@ window.addEventListener('resize', function() {
       var sc = el('study-content');
       if (sc && sc.style.display === 'flex') {
         var activeStr = [...practiceStrings].sort(function(a,b){return a-b;});
-        drawStudyFretboard(activeStr, practiceFretMin, practiceFretMax);
+        renderStudyFretboard(activeStr, practiceFretMin, practiceFretMax);
       } else if (currentKey) {
         var kn = knowledge[currentKey];
-        drawFretboard('fb-outer','fb-canvas', kn.s, kn.f, lastRevealNote, lastRevealWrong);
+        renderPracticeFretboard(kn, lastRevealNote, lastRevealWrong);
       }
       drawHeatmap('hm-canvas');
     }, 50);
@@ -754,7 +532,7 @@ function renderQuestion() {
     });
   }
 
-  drawFretboard('fb-outer', 'fb-canvas', kn.s, kn.f, null, false);
+  renderPracticeFretboard(kn, null, false);
   drawHeatmap('hm-canvas');
   updateTopBar();
 
@@ -828,7 +606,7 @@ function handleAnswer(chosen, correct, correctIdx, kn) {
     kn.due   = Date.now() + 8000;
     if (fb) { fb.style.color = '#993C1D'; fb.textContent = '✗ It\'s ' + correct + ' (' + eSec + 's) — string ' + (kn.s + 1) + ', fret ' + kn.f; }
     lastRevealNote = correct; lastRevealWrong = true;
-    drawFretboard('fb-outer', 'fb-canvas', kn.s, kn.f, correct, true);
+    renderPracticeFretboard(kn, correct, true);
   }
 
   var tv = el('timer-val');
@@ -950,7 +728,7 @@ function hideSettings() {
     practiceFretMax = pendingFretMax;
     accidentalMode  = pendingAccidental;
     var activeStr = [...practiceStrings].sort(function(a,b){return a-b;});
-    drawStudyFretboard(activeStr, practiceFretMin, practiceFretMax);
+    renderStudyFretboard(activeStr, practiceFretMin, practiceFretMax);
   }
   /* resume if mid-session practice was paused by opening settings */
   if (quizMode === 'practice' && currentKey && paused) togglePause();
@@ -1078,7 +856,7 @@ function applySettings() {
   var sc = el('study-content');
   if (sc && sc.style.display === 'flex') {
     var activeStr = [...practiceStrings].sort(function(a,b){return a-b;});
-    drawStudyFretboard(activeStr, practiceFretMin, practiceFretMax);
+    renderStudyFretboard(activeStr, practiceFretMin, practiceFretMax);
   } else {
     showPracticeIdle();
   }
@@ -1297,7 +1075,7 @@ function switchTab(tab) {
     /* pause any running quiz when switching to study */
     if (!answered && currentKey && !paused) togglePause();
     var activeStr = [...practiceStrings].sort(function(a,b){return a-b;});
-    setTimeout(function(){ drawStudyFretboard(activeStr, practiceFretMin, practiceFretMax); }, 30);
+    setTimeout(function(){ renderStudyFretboard(activeStr, practiceFretMin, practiceFretMax); }, 30);
   }
 
   if (tab === 'practice') {
@@ -1318,6 +1096,7 @@ function selectInstrument(id) {
   restoreInstrumentState(id);
   saveState();
   updateInstrumentToggle();
+  updateSetupConfirm();
   updateTopBar();
 }
 
@@ -1327,8 +1106,31 @@ function updateInstrumentToggle() {
   if (bi) bi.className = 'inst-btn' + (instrument === 'bass'   ? ' active' : '');
 }
 
+function selectHandedness(mode) {
+  var wantLeft = (mode === 'left');
+  if (wantLeft === leftHanded) return;
+  leftHanded = wantLeft;
+  saveState();
+  updateHandednessToggle();
+  updateSetupConfirm();
+}
+
+function updateHandednessToggle() {
+  var ri = el('hand-right'), li = el('hand-left');
+  if (ri) ri.className = 'inst-btn' + (!leftHanded ? ' active' : '');
+  if (li) li.className = 'inst-btn' + (leftHanded  ? ' active' : '');
+}
+
+function updateSetupConfirm() {
+  var c = el('setup-confirm');
+  if (!c) return;
+  c.textContent = 'You are playing the ' + inst().label.toLowerCase() + ' ' + (leftHanded ? 'left' : 'right') + '-handed.';
+}
+
 function showHome() {
   updateInstrumentToggle();
+  updateHandednessToggle();
+  updateSetupConfirm();
   if (currentModule === 'fundamentals') exitFundamentals();
   if (currentModule === 'chords') exitChords();
   if (currentModule === 'triads') exitTriads();

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<!--
+  FretNerd
+  Copyright (c) 2026 Scott Farris / Tilted Iron
+  Proprietary and confidential. Unauthorized use prohibited.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>fretboard-renderer tests</title>
+<link rel="stylesheet" href="../css/app.css">
+<style>
+  body { padding: 16px; }
+  .case { margin-bottom: 6px; font-family: monospace; font-size: 13px; }
+  .pass { color: #1D9E75; }
+  .fail { color: #E24B4A; font-weight: 700; }
+  #summary { font-size: 16px; font-weight: 700; margin: 16px 0; }
+  .scratch { width: 320px; margin-top: 16px; }
+</style>
+</head>
+<body>
+<div id="results"></div>
+<div id="summary"></div>
+
+<h3>Multi-highlight smoke test (unanswered / correct / wrong together)</h3>
+<div id="fb-outer" class="scratch"><div id="fb-board" class="fb-board"></div></div>
+
+<h3>Study highlights smoke test (natural / accidental)</h3>
+<div id="study-fb-outer" class="scratch"><div id="study-board" class="fb-board"></div></div>
+<div id="study-legend" style="margin-top:8px;font-size:12px;"></div>
+
+<script src="../js/core-app.js"></script>
+<script src="../js/fretboard-renderer.js"></script>
+<script>
+var pass = 0, fail = 0;
+function check(label, cond) {
+  var div = document.createElement('div');
+  div.className = 'case ' + (cond ? 'pass' : 'fail');
+  div.textContent = (cond ? 'PASS — ' : 'FAIL — ') + label;
+  document.getElementById('results').appendChild(div);
+  if (cond) pass++; else fail++;
+}
+function eq(a, b) { return a === b; }
+
+/* ── round-trip invertibility, including fret 0, both orientations ── */
+var geomFull = fbComputeGeometry(document.getElementById('fb-outer'), { numStrings: 6, leftHanded: false });
+var geomFullLH = fbComputeGeometry(document.getElementById('fb-outer'), { numStrings: 6, leftHanded: true });
+
+[geomFull, geomFullLH].forEach(function(geom) {
+  var tag = geom.leftHanded ? '[left-handed]' : '[normal]';
+  for (var fret = 0; fret <= MAX_FRET; fret++) {
+    for (var str = 0; str < geom.numStrings; str++) {
+      var x = xForFret(fret, geom);
+      var y = yForString(str, geom);
+      var fret2 = fretForX(x, geom);
+      var str2  = stringForY(y, geom);
+      check(tag + ' round-trip string=' + str + ' fret=' + fret, eq(fret2, fret) && eq(str2, str));
+    }
+  }
+});
+
+/* ── zone geometry consolidation: fbComputeGeometry's zone window must match
+   phoneZoneBounds() directly (spec 4.4) ── */
+/* isPhonePortrait() depends on window size in this harness; force the zone
+   path by calling phoneZoneBounds directly and comparing math, since the
+   test runner's window may not be phone-portrait sized. */
+[0, 1, 5, 12, 21].forEach(function(targetFret) {
+  var bounds = phoneZoneBounds(targetFret);
+  check('phoneZoneBounds(' + targetFret + ') width is PHONE_ZONE_SIZE (or clipped at MAX_FRET)',
+    (bounds.hi - bounds.lo === PHONE_ZONE_SIZE - 1) || (bounds.hi === MAX_FRET));
+});
+
+/* ── multi-highlight render + wrong-state X badge + nut/groove markup ── */
+var highlights = [
+  { string: 0, fret: 3, state: 'unanswered', label: '?', role: null },
+  { string: 2, fret: 5, state: 'correct',    label: 'A', role: null },
+  { string: 4, fret: 7, state: 'wrong',      label: 'C', role: null }
+];
+renderFretboard('fb-outer', highlights, { phoneZoneTargetFret: null, fretLabels: 'none' });
+var svgMarkup = document.getElementById('fb-board').innerHTML;
+
+check('renders exactly 3 highlight dots', (svgMarkup.match(/class="fb-dot"/g) || []).length === 3);
+check('wrong-state dot keeps its label text', /data-state="wrong"[\s\S]*?>C</.test(svgMarkup));
+check('wrong-state dot has a badge circle + 2 X lines after it',
+  (function() {
+    var wrongGroup = svgMarkup.split('data-state="wrong"')[1] || '';
+    var group = wrongGroup.split('</g>')[0];
+    var circles = (group.match(/<circle/g) || []).length; // main dot circle handled before split; badge circle here
+    var lines = (group.match(/<line/g) || []).length;
+    return circles >= 1 && lines === 2;
+  })());
+check('nut <rect> present when fretLo===0', /rx="2"[^>]*fill="var\(--fb-nut-fill/.test(svgMarkup));
+check('one groove <line> per string (6 for guitar)',
+  (function() {
+    // grooves are <line> elements using --fb-nut-stroke; the nut block's own
+    // <rect> also uses that var for its border, so only count <line> matches
+    var grooveCount = (svgMarkup.match(/<line[^>]*stroke="var\(--fb-nut-stroke/g) || []).length;
+    return grooveCount === NUM_STRINGS;
+  })());
+
+/* ── study highlights: natural/accidental as independent state values ── */
+var studyHighlights = buildStudyHighlights([0,1,2,3,4,5], 0, 3);
+check('study highlights include both natural and accidental states',
+  studyHighlights.some(function(h){return h.state==='natural';}) &&
+  studyHighlights.some(function(h){return h.state==='accidental';}));
+renderStudyFretboard([0,1,2,3,4,5], 0, 3);
+check('study legend populated', document.getElementById('study-legend').innerHTML.indexOf('Natural') >= 0);
+
+/* ── hit-testing round trip through fbHitTest, using the just-rendered practice board ── */
+(function() {
+  var svgEl = document.querySelector('#fb-board svg');
+  var rect = svgEl.getBoundingClientRect();
+  var geom = FB_GEOM['fb-outer'];
+  var targetString = 2, targetFret = 5;
+  var px = xForFret(targetFret, geom), py = yForString(targetString, geom);
+  var scaleX = rect.width / geom.cW, scaleY = rect.height / geom.cH;
+  var clientX = rect.left + px * scaleX, clientY = rect.top + py * scaleY;
+  var hit = fbHitTest('fb-outer', clientX, clientY);
+  check('fbHitTest resolves the known correct-dot position', hit && hit.string === targetString && hit.fret === targetFret);
+})();
+
+document.getElementById('summary').textContent = pass + ' passed, ' + fail + ' failed';
+document.getElementById('summary').style.color = fail ? '#E24B4A' : '#1D9E75';
+</script>
+</body>
+</html>

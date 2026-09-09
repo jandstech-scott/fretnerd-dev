@@ -16,9 +16,6 @@ var TRIAD_STUDY_QUALITY   = 'major';
 var TRIAD_STUDY_INVERSION = 0;      /* 0=root, 1=first, 2=second */
 var TRIAD_STUDY_SET       = 0;      /* string set index */
 
-/* Dot positions set by triadsDrawShape; used by canvas tap handler */
-var TRIADS_DOT_POSITIONS = null; /* [{x, y, r, d}] in CSS-pixel drawing coords */
-
 /* Practice filter state — fully independent of study */
 var TRIAD_PRACTICE_FILTERS = {
   sets:       null,              /* null = all; or array of set indices */
@@ -27,7 +24,6 @@ var TRIAD_PRACTICE_FILTERS = {
 };
 
 /* Build-the-shape exercise state */
-var TRIADS_BUILD_GEOMETRY = null; /* set by triadsDrawBuildCanvas; used for click→fret mapping */
 var TRIAD_BUILD = { placed: [], validated: false }; /* placed: [{stringIdx, fret}] */
 
 /* ── Instrument-specific tables ─────────────────── */
@@ -76,6 +72,7 @@ var TRIAD_COLOR_THIRD = '#6C5CE7';
 var TRIAD_COLOR_FIFTH = '#BA7517';
 var TRIAD_ROLE_COLORS = [TRIAD_COLOR_ROOT, TRIAD_COLOR_THIRD, TRIAD_COLOR_FIFTH];
 var TRIAD_ROLE_LABELS = ['1', '3', '5'];
+var TRIAD_ROLE_NAMES  = ['root', 'third', 'fifth']; /* fretboard-renderer.js highlight state/role names */
 
 /* ── Shape computation ──────────────────────────────── */
 

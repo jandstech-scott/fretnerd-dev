@@ -278,7 +278,7 @@ function triadsInteractiveHTML() {
 
       hr +
 
-      '<canvas id="triads-canvas" style="display:block;width:100%;margin-bottom:6px;"></canvas>' +
+      '<div id="triads-fb-outer" style="margin-bottom:6px;"><div id="triads-board" class="fb-board"></div></div>' +
 
       /* Legend + bass note label */
       '<div style="display:flex;align-items:center;gap:10px;">' +
@@ -306,334 +306,79 @@ function triadsInteractiveHTML() {
   );
 }
 
-/* ── Canvas drawing ─────────────────────────────── */
+/* ── Rendering (shared SVG component — js/fretboard-renderer.js) ── */
+
+/* Both Study and Practice-build show a window sized to the shape's own
+   span, not the full neck — same math the old canvas code used. */
+function triadsFretWindow(shape) {
+  var minF     = Math.min.apply(null, shape.frets);
+  var maxF     = Math.max.apply(null, shape.frets);
+  var span     = maxF - minF + 1;
+  var numFrets = Math.max(span, 5);
+  var loW      = Math.max(0, minF - Math.floor((numFrets - span) / 2) - 1);
+  return { lo: loW, hi: loW + numFrets };
+}
+
+function triadsRenderBoard(shape, highlights) {
+  renderFretboard('triads-fb-outer', highlights, {
+    fretWindow:    triadsFretWindow(shape),
+    activeStrings: shape.strings,
+    fretLabels:    'zone',
+    numStrings:    triadsNumStrings()
+  });
+}
+
+/* Study mode: the 3 shape notes, colored + labeled by role (root/3rd/5th) */
+function triadsShapeHighlights(shape, hideDotLabels) {
+  return shape.roles.map(function(role, d) {
+    return {
+      string: shape.strings[d],
+      fret:   shape.frets[d],
+      state:  'triad-' + TRIAD_ROLE_NAMES[role],
+      label:  hideDotLabels ? null : TRIAD_ROLE_LABELS[role],
+      role:   TRIAD_ROLE_NAMES[role]
+    };
+  });
+}
 
 function triadsDrawCanvas(hideDotLabels) {
-  var canvas = el('triads-canvas');
-  if (!canvas) return;
   var shape = triadsGetShape(TRIAD_STUDY_ROOT, TRIAD_STUDY_QUALITY, TRIAD_STUDY_INVERSION, TRIAD_STUDY_SET);
-  triadsDrawShape(canvas, shape, hideDotLabels);
+  triadsRenderBoard(shape, triadsShapeHighlights(shape, hideDotLabels));
 }
 
-function triadsDrawPracticeCanvas(shape) {
-  var canvas = el('triads-canvas');
-  if (!canvas) return;
-  triadsDrawShape(canvas, shape, true, true); /* hide labels AND role colors */
-}
-
-function triadsRevealAnswerCanvas(shape) {
-  var canvas = el('triads-canvas');
-  if (!canvas) return;
-  triadsDrawShape(canvas, shape, false, false); /* show colors and role labels */
-}
-
-function triadsDrawShape(canvas, shape, hideDotLabels, hideRoleColors) {
-  var dark = isDark();
-  var dpr  = window.devicePixelRatio || 1;
-  var n    = triadsNumStrings(); /* 4 for bass, 6 for guitar */
-
-  var cW = (canvas.parentElement ? canvas.parentElement.clientWidth : 0) - 24;
-  if (cW <= 10) cW = window.innerWidth - 48;
-  cW = Math.max(180, cW);
-
-  var allFrets = shape.frets;
-  var minF     = Math.min.apply(null, allFrets);
-  var maxF     = Math.max.apply(null, allFrets);
-  var span     = maxF - minF + 1;
-  var numFrets = Math.max(span, 5);
-  var loW      = Math.max(0, minF - Math.floor((numFrets - span) / 2) - 1);
-
-  var zoneAspect = NECK_ASPECT * (numFrets / 21) * 1.8;
-  var cH         = Math.max(70, Math.floor(cW / zoneAspect));
-
-  canvas.width        = Math.round(cW * dpr);
-  canvas.height       = Math.round(cH * dpr);
-  canvas.style.width  = cW + 'px';
-  canvas.style.height = cH + 'px';
-
-  var ctx = canvas.getContext('2d');
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.clearRect(0, 0, cW, cH);
-
-  /* Symmetric left/right padding so board is horizontally centered.
-     String labels ("1"–"6") hang left from PL - 4 and are only ~6px wide. */
-  var PL = Math.round(cW * 0.06);
-  var PR = PL;
-  var PT = Math.round(cH * 0.10);
-  var PB = Math.round(cH * 0.24);
-
-  /* zoneMarginFrac reserves fret-label space when loW > 0 inside the board
-     width, so the board never overflows the right edge. */
-  var zoneMarginFrac = loW > 0 ? 0.35 : 0;
-  var fw = (cW - PL - PR) / (numFrets + zoneMarginFrac);
-  var zoneMargin = Math.round(fw * zoneMarginFrac);
-
-  var sh = (cH - PT - PB) / (n - 1);
-
-  /* Board background */
-  ctx.fillStyle = dark ? '#1e1400' : '#f9f4e8';
-  ctx.fillRect(PL, PT, zoneMargin + numFrets * fw, (n - 1) * sh);
-
-  /* Nut or zone-start marker */
-  if (loW === 0) {
-    ctx.strokeStyle = dark ? '#bbb' : '#333';
-    ctx.lineWidth   = Math.max(3, fw * 0.12);
-    ctx.beginPath(); ctx.moveTo(PL, PT); ctx.lineTo(PL, PT + (n-1)*sh); ctx.stroke();
+/* Practice "build the shape": placed dots (gray while unvalidated, role-
+   colored+labeled if correct, plain red if wrong) plus outlined "missing"
+   indicators showing correct positions once validated. */
+function triadsPlacedHighlights(placed, validatedData) {
+  if (!validatedData) {
+    return placed.map(function(dot) {
+      return { string: dot.stringIdx, fret: dot.fret, state: 'triad-neutral', label: null, role: null };
+    });
   }
-
-  /* Fret lines */
-  var fStart = loW === 0 ? 1 : 0;
-  for (var f = fStart; f <= numFrets; f++) {
-    ctx.strokeStyle = dark ? '#3a3a3a' : '#ddd';
-    ctx.lineWidth   = 1;
-    ctx.beginPath();
-    ctx.moveTo(PL + zoneMargin + f * fw, PT);
-    ctx.lineTo(PL + zoneMargin + f * fw, PT + (n-1)*sh);
-    ctx.stroke();
-  }
-
-  /* Strings: active set visible, others dimmed */
-  var activeSet = shape.strings;
-  for (var s = 0; s < n; s++) {
-    var sy    = PT + s * sh;
-    var inSet = activeSet.indexOf(s) !== -1;
-    ctx.strokeStyle = inSet
-      ? (dark ? 'rgba(200,200,200,0.75)' : 'rgba(80,80,80,0.75)')
-      : (dark ? 'rgba(110,110,110,0.20)' : 'rgba(170,170,170,0.20)');
-    ctx.lineWidth = Math.max(0.5, 0.5 + s * 0.3) * (inSet ? 1.5 : 0.7);
-    ctx.beginPath();
-    ctx.moveTo(PL, sy);
-    ctx.lineTo(PL + zoneMargin + numFrets * fw, sy);
-    ctx.stroke();
-  }
-
-  /* Position dots */
-  var dr = Math.max(3, Math.min(sh * 0.2, fw * 0.15));
-  [3,5,7,9,12,15,17,19].forEach(function(fd) {
-    var fi = fd - loW;
-    if (fi <= 0 || fi > numFrets) return;
-    var x = PL + zoneMargin + (fi - 0.5) * fw;
-    ctx.fillStyle = dark ? '#3a3a3a' : '#e0e0e0';
-    if (fd === 12) {
-      ctx.beginPath(); ctx.arc(x, PT + (n-1)*sh*0.3, dr, 0, Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.arc(x, PT + (n-1)*sh*0.7, dr, 0, Math.PI*2); ctx.fill();
-    } else {
-      ctx.beginPath(); ctx.arc(x, PT + (n-1)*sh*0.5, dr, 0, Math.PI*2); ctx.fill();
+  var highlights = placed.map(function(dot, i) {
+    var res = validatedData.results[i];
+    if (res.correct) {
+      return {
+        string: dot.stringIdx, fret: dot.fret,
+        state: 'triad-' + TRIAD_ROLE_NAMES[res.role], label: TRIAD_ROLE_LABELS[res.role], role: TRIAD_ROLE_NAMES[res.role]
+      };
     }
+    return { string: dot.stringIdx, fret: dot.fret, state: 'triad-wrong', label: null, role: null };
   });
-
-  /* Fret number labels */
-  var labelY = PT + (n-1)*sh + PB * 0.62;
-  ctx.font         = Math.max(8, Math.min(11, fw * 0.38)) + 'px -apple-system,sans-serif';
-  ctx.fillStyle    = dark ? '#666' : '#999';
-  ctx.textAlign    = 'center';
-  ctx.textBaseline = 'alphabetic';
-  if (loW > 0) ctx.fillText(loW, PL + zoneMargin * 0.5, labelY);
-  for (var fi2 = 1; fi2 <= numFrets; fi2++) {
-    ctx.fillText(loW + fi2, PL + zoneMargin + (fi2 - 0.5) * fw, labelY);
-  }
-
-  /* String number labels */
-  ctx.font         = Math.max(8, Math.min(11, sh * 0.5)) + 'px -apple-system,sans-serif';
-  ctx.fillStyle    = dark ? '#555' : '#bbb';
-  ctx.textAlign    = 'right';
-  ctx.textBaseline = 'middle';
-  for (var sl = 0; sl < n; sl++) ctx.fillText(sl + 1, PL - 4, PT + sl * sh);
-
-  /* Triad dots */
-  var dotR = Math.max(8, Math.min(sh * 0.42, fw * 0.36));
-  TRIADS_DOT_POSITIONS = [];
-  for (var d = 0; d < 3; d++) {
-    var dx = PL + zoneMargin + (shape.frets[d] - loW - 0.5) * fw;
-    var dy = PT + shape.strings[d] * sh;
-    TRIADS_DOT_POSITIONS.push({ x: dx, y: dy, r: dotR, d: d });
-    ctx.beginPath();
-    ctx.arc(dx, dy, dotR, 0, Math.PI * 2);
-    ctx.fillStyle = hideRoleColors
-      ? (dark ? '#555' : '#bbb')
-      : TRIAD_ROLE_COLORS[shape.roles[d]];
-    ctx.fill();
-    if (!hideDotLabels && !hideRoleColors) {
-      ctx.fillStyle    = '#fff';
-      ctx.font         = 'bold ' + Math.max(9, Math.floor(dotR)) + 'px -apple-system,sans-serif';
-      ctx.textAlign    = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(TRIAD_ROLE_LABELS[shape.roles[d]], dx, dy);
-    }
-  }
-  ctx.textBaseline = 'alphabetic';
+  validatedData.missing.forEach(function(miss) {
+    highlights.push({
+      string: miss.stringIdx, fret: miss.fret,
+      state: 'triad-' + TRIAD_ROLE_NAMES[miss.role], label: TRIAD_ROLE_LABELS[miss.role], role: TRIAD_ROLE_NAMES[miss.role],
+      outline: true
+    });
+  });
+  return highlights;
 }
 
-/* Build-the-shape canvas: draws the fretboard without pre-placed dots.
-   placed = [{stringIdx, fret}] user dots to draw.
+/* placed = [{stringIdx, fret}] user dots to draw.
    validatedData = null while placing, or {results:[{correct,role}], missing:[{stringIdx,fret,role}]} */
 function triadsDrawBuildCanvas(shape, placed, validatedData) {
-  var canvas = el('triads-canvas');
-  if (!canvas) return;
-
-  var dark = isDark();
-  var dpr  = window.devicePixelRatio || 1;
-  var n    = triadsNumStrings();
-
-  var cW = (canvas.parentElement ? canvas.parentElement.clientWidth : 0) - 24;
-  if (cW <= 10) cW = window.innerWidth - 48;
-  cW = Math.max(180, cW);
-
-  var allFrets = shape.frets;
-  var minF     = Math.min.apply(null, allFrets);
-  var maxF     = Math.max.apply(null, allFrets);
-  var span     = maxF - minF + 1;
-  var numFrets = Math.max(span, 5);
-  var loW      = Math.max(0, minF - Math.floor((numFrets - span) / 2) - 1);
-
-  var zoneAspect = NECK_ASPECT * (numFrets / 21) * 1.8;
-  var cH         = Math.max(70, Math.floor(cW / zoneAspect));
-
-  canvas.width        = Math.round(cW * dpr);
-  canvas.height       = Math.round(cH * dpr);
-  canvas.style.width  = cW + 'px';
-  canvas.style.height = cH + 'px';
-
-  var ctx = canvas.getContext('2d');
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.clearRect(0, 0, cW, cH);
-
-  var PL = Math.round(cW * 0.06);
-  var PR = PL;
-  var PT = Math.round(cH * 0.10);
-  var PB = Math.round(cH * 0.24);
-
-  var zoneMarginFrac = loW > 0 ? 0.35 : 0;
-  var fw             = (cW - PL - PR) / (numFrets + zoneMarginFrac);
-  var zoneMargin     = Math.round(fw * zoneMarginFrac);
-  var sh             = (cH - PT - PB) / (n - 1);
-
-  /* Store geometry so the tap handler can map clicks to (string, fret) */
-  TRIADS_BUILD_GEOMETRY = {
-    PL: PL, PT: PT, fw: fw, sh: sh,
-    loW: loW, numFrets: numFrets, zoneMargin: zoneMargin,
-    strings: shape.strings
-  };
-
-  /* Board background */
-  ctx.fillStyle = dark ? '#1e1400' : '#f9f4e8';
-  ctx.fillRect(PL, PT, zoneMargin + numFrets * fw, (n - 1) * sh);
-
-  /* Nut or zone-start marker */
-  if (loW === 0) {
-    ctx.strokeStyle = dark ? '#bbb' : '#333';
-    ctx.lineWidth   = Math.max(3, fw * 0.12);
-    ctx.beginPath(); ctx.moveTo(PL, PT); ctx.lineTo(PL, PT + (n-1)*sh); ctx.stroke();
-  }
-
-  /* Fret lines */
-  var fStart = loW === 0 ? 1 : 0;
-  for (var f = fStart; f <= numFrets; f++) {
-    ctx.strokeStyle = dark ? '#3a3a3a' : '#ddd';
-    ctx.lineWidth   = 1;
-    ctx.beginPath();
-    ctx.moveTo(PL + zoneMargin + f * fw, PT);
-    ctx.lineTo(PL + zoneMargin + f * fw, PT + (n-1)*sh);
-    ctx.stroke();
-  }
-
-  /* Strings: active set at full weight, inactive strings dimmed */
-  var activeSet = shape.strings;
-  for (var s = 0; s < n; s++) {
-    var sy    = PT + s * sh;
-    var inSet = activeSet.indexOf(s) !== -1;
-    ctx.strokeStyle = inSet
-      ? (dark ? 'rgba(200,200,200,0.75)' : 'rgba(80,80,80,0.75)')
-      : (dark ? 'rgba(110,110,110,0.20)' : 'rgba(170,170,170,0.20)');
-    ctx.lineWidth = Math.max(0.5, 0.5 + s * 0.3) * (inSet ? 1.5 : 0.7);
-    ctx.beginPath();
-    ctx.moveTo(PL, sy);
-    ctx.lineTo(PL + zoneMargin + numFrets * fw, sy);
-    ctx.stroke();
-  }
-
-  /* Position dots */
-  var dr = Math.max(3, Math.min(sh * 0.2, fw * 0.15));
-  [3,5,7,9,12,15,17,19].forEach(function(fd) {
-    var fi = fd - loW;
-    if (fi <= 0 || fi > numFrets) return;
-    var x = PL + zoneMargin + (fi - 0.5) * fw;
-    ctx.fillStyle = dark ? '#3a3a3a' : '#e0e0e0';
-    if (fd === 12) {
-      ctx.beginPath(); ctx.arc(x, PT + (n-1)*sh*0.3, dr, 0, Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.arc(x, PT + (n-1)*sh*0.7, dr, 0, Math.PI*2); ctx.fill();
-    } else {
-      ctx.beginPath(); ctx.arc(x, PT + (n-1)*sh*0.5, dr, 0, Math.PI*2); ctx.fill();
-    }
-  });
-
-  /* Fret number labels */
-  var labelY = PT + (n-1)*sh + PB * 0.62;
-  ctx.font         = Math.max(8, Math.min(11, fw * 0.38)) + 'px -apple-system,sans-serif';
-  ctx.fillStyle    = dark ? '#666' : '#999';
-  ctx.textAlign    = 'center';
-  ctx.textBaseline = 'alphabetic';
-  if (loW > 0) ctx.fillText(loW, PL + zoneMargin * 0.5, labelY);
-  for (var fi2 = 1; fi2 <= numFrets; fi2++) {
-    ctx.fillText(loW + fi2, PL + zoneMargin + (fi2 - 0.5) * fw, labelY);
-  }
-
-  /* String number labels */
-  ctx.font         = Math.max(8, Math.min(11, sh * 0.5)) + 'px -apple-system,sans-serif';
-  ctx.fillStyle    = dark ? '#555' : '#bbb';
-  ctx.textAlign    = 'right';
-  ctx.textBaseline = 'middle';
-  for (var sl = 0; sl < n; sl++) ctx.fillText(sl + 1, PL - 4, PT + sl * sh);
-
-  var dotR = Math.max(8, Math.min(sh * 0.42, fw * 0.36));
-
-  /* User-placed dots */
-  for (var i = 0; i < placed.length; i++) {
-    var dot = placed[i];
-    var dx  = PL + zoneMargin + (dot.fret - loW - 0.5) * fw;
-    var dy  = PT + dot.stringIdx * sh;
-    ctx.beginPath();
-    ctx.arc(dx, dy, dotR, 0, Math.PI * 2);
-    if (!validatedData) {
-      ctx.fillStyle = dark ? '#666' : '#aaa';
-      ctx.fill();
-    } else {
-      var res = validatedData.results[i];
-      if (res.correct) {
-        ctx.fillStyle = TRIAD_ROLE_COLORS[res.role];
-        ctx.fill();
-        ctx.fillStyle    = '#fff';
-        ctx.font         = 'bold ' + Math.max(9, Math.floor(dotR)) + 'px -apple-system,sans-serif';
-        ctx.textAlign    = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(TRIAD_ROLE_LABELS[res.role], dx, dy);
-      } else {
-        ctx.fillStyle = '#e53e3e';
-        ctx.fill();
-      }
-    }
-  }
-
-  /* Missing correct positions: outlined circles showing where notes go */
-  if (validatedData && validatedData.missing) {
-    for (var m = 0; m < validatedData.missing.length; m++) {
-      var miss = validatedData.missing[m];
-      var mx   = PL + zoneMargin + (miss.fret - loW - 0.5) * fw;
-      var my   = PT + miss.stringIdx * sh;
-      ctx.beginPath();
-      ctx.arc(mx, my, dotR, 0, Math.PI * 2);
-      ctx.strokeStyle = TRIAD_ROLE_COLORS[miss.role];
-      ctx.lineWidth   = 2;
-      ctx.stroke();
-      ctx.fillStyle    = TRIAD_ROLE_COLORS[miss.role];
-      ctx.font         = 'bold ' + Math.max(9, Math.floor(dotR)) + 'px -apple-system,sans-serif';
-      ctx.textAlign    = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(TRIAD_ROLE_LABELS[miss.role], mx, my);
-    }
-  }
-
-  ctx.textBaseline = 'alphabetic';
+  triadsRenderBoard(shape, triadsPlacedHighlights(placed, validatedData));
 }
 
 /* ── Study control callbacks ────────────────────── */

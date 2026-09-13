@@ -138,6 +138,37 @@ var storage = (function() {
   }
 })();
 
+/* ── Usage analytics (PostHog, direct fetch — no SDK) ── */
+var PH_KEY  = 'phc_tqeBbBxhLNUFxM2XEiFk4eawBcdpyjWF8DA6Z6tHRYxt';
+var PH_HOST = 'https://us.i.posthog.com';
+
+/* separate key from SAVE_KEY — SAVE_KEY is versioned and gets abandoned on
+   future schema bumps, which would silently reset the user count */
+var UID_KEY = 'fn_uid_v1';
+function getAnonId() {
+  var id = storage.getItem(UID_KEY);
+  if (!id) {
+    id = 'u_' + Date.now().toString(36) + Math.random().toString(36).slice(2);
+    storage.setItem(UID_KEY, id);
+  }
+  return id;
+}
+
+function track(event, props) {
+  try {
+    fetch(PH_HOST + '/i/v0/e/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        api_key: PH_KEY,
+        event: event,
+        distinct_id: getAnonId(),
+        properties: props || {}
+      })
+    }).catch(function() {});
+  } catch (e) {}
+}
+
 function saveState() {
   try {
     snapshotCurrentInstrument();
@@ -1232,6 +1263,7 @@ function endTour() {
 }
 
 function launchModule(id) {
+  track('module_open', { module: id });
   if (id === 'notes') {
     currentModule = 'notes';
     el('app').classList.remove('simple-module');
@@ -1291,6 +1323,7 @@ function showDebug() {
    SECTION 18: INIT
 ═══════════════════════════════════════════════════════════════ */
 loadState();
+track('app_open');
 updateSpeedLegend();
 updateTopBar();
 layoutApp();

@@ -99,16 +99,20 @@ function fundRenderConstructionQuestion(c, headerHtml, q) {
 
 function fundRenderConstructSlots(q) {
   var slots = '';
+  var formula = (q.constructionType === 'minorScale') ? FUND_MINOR_SCALE_FORMULA : FUND_MAJOR_SCALE_FORMULA;
+  /* formula has 7 steps for 7 scale degrees — one between each pair, plus one
+     more leading back to the octave root, so it must render alongside every
+     slot (not just the gaps between them) or the pattern shows one step short. */
   for (var i = 0; i < q.correctSequence.length; i++) {
     var filled = FUND_QUIZ.constructionSelections[i];
     var tapAttr = (filled !== undefined) ? (' onclick="fundClearConstructionSlot(' + i + ')"') : '';
     slots += '<div class="fq-construct-slot ' + (filled ? 'filled' : '') + (i === 0 ? ' root-slot' : '') + '"' + tapAttr + '>' + (filled || '') + '</div>';
-    if (i < q.correctSequence.length - 1) {
-      var formula = (q.constructionType === 'minorScale') ? FUND_MINOR_SCALE_FORMULA : FUND_MAJOR_SCALE_FORMULA;
-      var isHalf = formula[i] === 1;
-      slots += '<div class="fq-formula-connector ' + (isHalf ? 'half' : 'whole') + '">' + (isHalf ? 'H' : 'W') + '</div>';
-    }
+    var isHalf = formula[i] === 1;
+    slots += '<div class="fq-formula-connector ' + (isHalf ? 'half' : 'whole') + '">' + (isHalf ? 'H' : 'W') + '</div>';
   }
+  /* decorative octave echo of the root — completes the pattern visually,
+     not part of the puzzle (not in correctSequence, never tappable) */
+  slots += '<div class="fq-construct-slot filled root-slot" style="opacity:0.55;">' + q.correctSequence[0] + '</div>';
   return slots;
 }
 
@@ -193,16 +197,16 @@ function fundSubmitConstruction() {
   if (correct && q.keyRoot) FUND_QUIZ.keysCorrect[q.keyRoot] = true;
 
   var slotsHtml = '';
+  var revealFormula = (q.constructionType === 'minorScale') ? FUND_MINOR_SCALE_FORMULA : FUND_MAJOR_SCALE_FORMULA;
   for (var j = 0; j < q.correctSequence.length; j++) {
     var correctNote = q.correctSequence[j];
     var picked = FUND_QUIZ.constructionSelections[j];
     var isRight = (picked === correctNote);
     slotsHtml += '<div class="fq-construct-slot filled ' + (isRight ? 'right' : 'wrong') + (j === 0 ? ' root-slot' : '') + '">' + picked + (!isRight ? ('<span class="fq-construct-correction">' + correctNote + '</span>') : '') + '</div>';
-    if (j < q.correctSequence.length - 1) {
-      var isHalf2 = FUND_MAJOR_SCALE_FORMULA[j] === 1;
-      slotsHtml += '<div class="fq-formula-connector ' + (isHalf2 ? 'half' : 'whole') + '">' + (isHalf2 ? 'H' : 'W') + '</div>';
-    }
+    var isHalf2 = revealFormula[j] === 1;
+    slotsHtml += '<div class="fq-formula-connector ' + (isHalf2 ? 'half' : 'whole') + '">' + (isHalf2 ? 'H' : 'W') + '</div>';
   }
+  slotsHtml += '<div class="fq-construct-slot filled root-slot" style="opacity:0.55;">' + q.correctSequence[0] + '</div>';
   el('fqConstructSlots').innerHTML = slotsHtml;
 
   var poolBtns = document.querySelectorAll('.fq-construct-pool-note');

@@ -130,7 +130,10 @@ function fundPingAlpha(note) {
   var idx = FUND_NATURALS.indexOf(note);
   var next = FUND_NATURALS[(idx + 1) % FUND_NATURALS.length];
   var msg = el('alphaMsg');
-  if (msg) msg.textContent = 'After ' + note + ' comes ' + next + ' \u2014 ' + (note === 'G' ? 'back to A (one octave up)' : 'up one step');
+  /* No "step" language here \u2014 whole/half steps aren't introduced until Stage 2,
+     and E\u2192F / B\u2192C are half steps while the rest are whole steps, so a blanket
+     "up one step" was actively wrong for half of these pairs. */
+  if (msg) msg.textContent = 'After ' + note + ' comes ' + next + (note === 'G' ? ' \u2014 back to A (one octave up)' : '');
 
   setTimeout(function() {
     if (noteEl) noteEl.classList.remove('active');

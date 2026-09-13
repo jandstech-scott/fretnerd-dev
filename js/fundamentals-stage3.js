@@ -98,7 +98,7 @@ function fundPingChromatic(name, type) {
   setTimeout(function() {
     if (noteEl) noteEl.classList.remove('hl-nat', 'hl-acc');
     if (msg) msg.textContent = '';
-  }, 2500);
+  }, 4000);
 }
 
 function fundSetEnharm(idx) {

@@ -479,20 +479,26 @@ function fundBuildMajorScale(root) {
   return notes;
 }
 
+/* Chromatic order (C up to B), not circle-of-fifths — the circle order doesn't
+   mean anything yet to a student who hasn't reached Stage 5. Where a pitch
+   class has two spellings (F#/Gb), the sharp spelling comes first, matching
+   the "sharps before flats" convention used elsewhere in this stage. Every
+   other consumer of FUND_MAJOR_KEYS (which this builds) does keyed lookup or
+   random sampling, so this order only affects the on-screen key-picker rows. */
 var FUND_KEY_SIGNATURES_RAW = [
   { key: 'C',  sharps: 0, flats: 0 },
-  { key: 'G',  sharps: 1, flats: 0 },
-  { key: 'D',  sharps: 2, flats: 0 },
-  { key: 'A',  sharps: 3, flats: 0 },
-  { key: 'E',  sharps: 4, flats: 0 },
-  { key: 'B',  sharps: 5, flats: 0 },
-  { key: 'F#', sharps: 6, flats: 0 },
-  { key: 'F',  sharps: 0, flats: 1 },
-  { key: 'Bb', sharps: 0, flats: 2 },
-  { key: 'Eb', sharps: 0, flats: 3 },
-  { key: 'Ab', sharps: 0, flats: 4 },
   { key: 'Db', sharps: 0, flats: 5 },
-  { key: 'Gb', sharps: 0, flats: 6 }
+  { key: 'D',  sharps: 2, flats: 0 },
+  { key: 'Eb', sharps: 0, flats: 3 },
+  { key: 'E',  sharps: 4, flats: 0 },
+  { key: 'F',  sharps: 0, flats: 1 },
+  { key: 'F#', sharps: 6, flats: 0 },
+  { key: 'Gb', sharps: 0, flats: 6 },
+  { key: 'G',  sharps: 1, flats: 0 },
+  { key: 'Ab', sharps: 0, flats: 4 },
+  { key: 'A',  sharps: 3, flats: 0 },
+  { key: 'Bb', sharps: 0, flats: 2 },
+  { key: 'B',  sharps: 5, flats: 0 }
 ];
 
 var FUND_SHARP_ORDER = ['F#','C#','G#','D#','A#','E#','B#'];
@@ -832,13 +838,16 @@ var FUND_CIRCLE_KEYS = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'Db', 'Ab', 'Eb', 'B
 
 function fundBuildScaleBuilderHTML(key) {
   var items = '';
+  /* FUND_MAJOR_SCALE_FORMULA has 7 steps (W W H W W W H) — one between each of
+     the 7 scale degrees AND one more leading back up to the octave root. Loop
+     over every step, then cap it with that octave note, so the full formula
+     is visible instead of stopping one connector short. */
   for (var i = 0; i < key.scale.length; i++) {
     items += '<div class="fund-scale-note' + (i === 0 ? ' root' : '') + '">' + key.scale[i] + '</div>';
-    if (i < key.scale.length - 1) {
-      var isHalf = FUND_MAJOR_SCALE_FORMULA[i] === 1;
-      items += '<div class="fq-formula-connector ' + (isHalf ? 'half' : 'whole') + '">' + (isHalf ? 'H' : 'W') + '</div>';
-    }
+    var isHalf = FUND_MAJOR_SCALE_FORMULA[i] === 1;
+    items += '<div class="fq-formula-connector ' + (isHalf ? 'half' : 'whole') + '">' + (isHalf ? 'H' : 'W') + '</div>';
   }
+  items += '<div class="fund-scale-note root" style="opacity:0.55;">' + key.scale[0] + '</div>';
   return items;
 }
 
@@ -901,7 +910,8 @@ function fundBuildCircleSVG(opts) {
   var fsAngle = (fsIdx / n) * 2 * Math.PI - Math.PI / 2;
   var gbX = cx + (r + 36) * Math.cos(fsAngle);
   var gbY = cy + (r + 36) * Math.sin(fsAngle);
-  svg += '<text x="' + gbX + '" y="' + gbY + '" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text2)">= G\u266D major</text>';
+  var gbKey = fundKeyByRoot('Gb');
+  svg += '<text x="' + gbX + '" y="' + gbY + '" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text2)">= G\u266D major (' + gbKey.flats + '\u266D)</text>';
 
   if (!showMinors) {
     svg += '<text x="' + cx + '" y="' + (cy + 5) + '" text-anchor="middle" font-size="13" font-weight="600" fill="' + muted + '">12 keys,</text>';

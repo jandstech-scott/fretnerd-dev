@@ -61,5 +61,5 @@ function fundMeasureStep(note) {
     var items2 = document.querySelectorAll('.fund-step-note');
     for (var j = 0; j < items2.length; j++) items2[j].classList.remove('active');
     if (msg) msg.textContent = 'Tap any note to see the gap to the next one';
-  }, 2200);
+  }, 4000);
 }

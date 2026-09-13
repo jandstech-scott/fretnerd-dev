@@ -57,7 +57,7 @@ function fundStage4Page1() {
     '<div class="fund-lesson-card">' +
       '<div class="fund-eyebrow">Stage 4 \u00B7 Page 1 of 3</div>' +
       '<div class="fund-title">One formula. Twelve keys.</div>' +
-      '<div class="fund-body">A key is a home base \u2014 7 notes that sound resolved together. Every major key is built the exact same way: start on any note and apply the same pattern of whole and half steps you already know.</div>' +
+      '<div class="fund-body">A <strong>scale</strong> is a sequence of 7 notes, built from a pattern of whole and half steps. A <strong>key</strong> is that scale used as your home base \u2014 the notes and chords that feel like they belong together. Keys come in different flavors: major, minor, and others, each with its own step pattern. We\u2019ll start with major, the most common starting point. Every major key\u2019s scale is built the exact same way: start on any note and apply the pattern of whole and half steps you already know.</div>' +
     '</div>' +
 
     '<div class="fund-lesson-card">' +
@@ -208,12 +208,12 @@ function fundRenderListTab() {
   return (
     '<div style="display:flex;gap:10px;align-items:flex-start;">' +
       '<div class="fund-lesson-card" style="flex:1;min-width:0;">' +
-        '<div class="fund-sig-table-label flats">Flat keys</div>' +
-        '<div id="fundSigTableFlats">' + fundRenderSigTable(FUND_FLAT_TABLE_KEYS, 'flat') + '</div>' +
-      '</div>' +
-      '<div class="fund-lesson-card" style="flex:1;min-width:0;">' +
         '<div class="fund-sig-table-label sharps">Sharp keys</div>' +
         '<div id="fundSigTableSharps">' + fundRenderSigTable(FUND_SHARP_TABLE_KEYS, 'sharp') + '</div>' +
+      '</div>' +
+      '<div class="fund-lesson-card" style="flex:1;min-width:0;">' +
+        '<div class="fund-sig-table-label flats">Flat keys</div>' +
+        '<div id="fundSigTableFlats">' + fundRenderSigTable(FUND_FLAT_TABLE_KEYS, 'flat') + '</div>' +
       '</div>' +
     '</div>' +
     '<div class="fund-callout"><strong>Notice it stops at 6.</strong> F# major (6 sharps) and G\u266d major (6 flats) are enharmonic twins \u2014 the same pitches, two spellings. Flip to the Circle tab to see why they meet at the bottom.</div>' +

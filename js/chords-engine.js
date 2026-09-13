@@ -96,11 +96,11 @@ function chordsAnswerQuestion(choice) {
 
   if (correct) {
     html = wasSlow
-      ? '<span class="fq-fb-slow">✓ Correct (' + secs + 's) — getting there, not automatic yet</span>'
-      : '<span class="fq-fb-correct">✓ Correct (' + secs + 's)' + (CHORD_QUIZ.consecutiveCorrect >= 3 ? ' — ' + CHORD_QUIZ.consecutiveCorrect + ' in a row' : '') + '</span>';
+      ? '<span class="fq-fb-slow">✓ Correct (' + secs + 's), getting there, not automatic yet</span>'
+      : '<span class="fq-fb-correct">✓ Correct (' + secs + 's)' + (CHORD_QUIZ.consecutiveCorrect >= 3 ? ', ' + CHORD_QUIZ.consecutiveCorrect + ' in a row' : '') + '</span>';
   } else {
     var penalty = CHORD_QUIZ.consecutiveCorrect === 0 ? 'No streak to lose yet.' : 'Back to ' + CHORD_QUIZ.consecutiveCorrect + '.';
-    html = '<span class="fq-fb-wrong">✗ Not quite — it\'s <strong>' + q.correct + '</strong>. ' + penalty + '</span>';
+    html = '<span class="fq-fb-wrong">✗ Not quite: it\'s <strong>' + q.correct + '</strong>. ' + penalty + '</span>';
   }
 
   if (unlocked) {
@@ -145,15 +145,15 @@ function chordsRenderUnlockIntro(typeIdx) {
       '<div style="font-size:30px;margin-bottom:8px;">🔓</div>' +
       '<div class="fund-eyebrow" style="justify-content:center;">New question type</div>' +
       '<div class="fund-title" style="font-size:20px;">' + cfg.typeLabels[typeIdx] + '</div>' +
-      '<div class="fund-body" style="margin-top:6px;">You\'re doing well enough to mix in a new format. Here\'s a preview — no clock running yet.</div>' +
+      '<div class="fund-body" style="margin-top:6px;">You\'re doing well enough to mix in a new format. Here\'s a preview: no clock running yet.</div>' +
     '</div>' +
     '<div class="fq-shell" style="opacity:0.85;">' +
       '<div class="fq-prompt-row"><div><div class="fq-question">' + preview.prompt + '</div><div class="fq-sub">' + preview.sub + '</div></div>' +
       '<div class="fq-badge-col"><div class="fq-type-badge">' + preview.typeLabel + '</div></div></div>' +
       '<div class="fq-answers">' + optHtml + '</div>' +
-      '<div class="fq-feedback" style="color:var(--text2);">Preview only — nothing to tap.</div>' +
+      '<div class="fq-feedback" style="color:var(--text2);">Preview only: nothing to tap.</div>' +
     '</div>' +
-    '<button class="fund-cta-btn" onclick="chordsConfirmUnlock()">Got it — continue →</button>';
+    '<button class="fund-cta-btn" onclick="chordsConfirmUnlock()">Got it, continue →</button>';
 }
 
 function chordsConfirmUnlock() {
@@ -173,7 +173,7 @@ function chordsRenderSpeedNudge() {
   c.innerHTML =
     '<div class="fund-lesson-card" style="text-align:center;padding:24px 20px;">' +
       '<div style="font-size:30px;margin-bottom:8px;">⏱</div>' +
-      '<div class="fund-eyebrow" style="justify-content:center;">You know this — it\'s just not automatic yet</div>' +
+      '<div class="fund-eyebrow" style="justify-content:center;">You know this, but it\'s not automatic yet</div>' +
       '<div class="fund-title" style="font-size:18px;">Averaging ' + avg + 's.</div>' +
       '<div class="fund-body" style="margin-top:6px;">Every answer is right, but you\'re still thinking it through. A few more rounds and it should start feeling instant.</div>' +
     '</div>' +
@@ -213,7 +213,7 @@ function chordsRenderCompletion() {
       '<div style="font-size:40px;margin-bottom:12px;">🎸</div>' +
       '<div class="fund-eyebrow" style="justify-content:center;">Module Complete</div>' +
       '<div class="fund-title">Chord construction is yours.<br>Time to put it on the neck.</div>' +
-      '<div class="fund-body" style="margin-top:8px;">Five chord types, any root, no hesitation. Module 04 — Triad Positions — is up next.</div>' +
+      '<div class="fund-body" style="margin-top:8px;">Five chord types, any root, no hesitation. Module 04, Triad Positions, is up next.</div>' +
     '</div>' +
     '<button class="fund-cta-btn" onclick="showHome()">Back to Home</button>';
 }

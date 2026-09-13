@@ -106,7 +106,7 @@ function triadsGenQuestion() {
   var SS        = sets[setIdx];
 
   return {
-    prompt: TRIAD_ROOT_NAMES[root] + ' ' + quality + ' — ' + TRIAD_INV_FULL[inversion],
+    prompt: TRIAD_ROOT_NAMES[root] + ' ' + quality + ', ' + TRIAD_INV_FULL[inversion],
     sub:    SS.names + ' strings',
     shape:  shape
   };
@@ -203,9 +203,9 @@ function triadsBuildValidate() {
     var note = TRIAD_QUIZ.streak >= TRIAD_MASTERY_STREAK
       ? ' ' + TRIAD_QUIZ.streak + ' in a row!' : '';
     fb.innerHTML = '<span class="fq-fb-correct">✓ ' + TRIAD_INV_FULL[shape.inversion] +
-                   ' — ' + TRIAD_INV_BASS[shape.inversion] + '.' + note + '</span>';
+                   ': ' + TRIAD_INV_BASS[shape.inversion] + '.' + note + '</span>';
   } else {
-    fb.innerHTML = '<span class="fq-fb-wrong">Not quite — correct shape shown.</span>';
+    fb.innerHTML = '<span class="fq-fb-wrong">Not quite: correct shape shown.</span>';
   }
   fb.innerHTML += '<button class="fq-continue-btn" onclick="triadsNextQ()">Next →</button>';
 }

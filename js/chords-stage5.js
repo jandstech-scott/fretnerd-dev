@@ -21,11 +21,11 @@ function chordsStage5Study() {
         chordsCompareRow('maj7',  'var(--teal-lt)',   'var(--teal-txt)',  'Major 7',     'Floats, dreamy. Jazz, bossa nova.') +
         chordsCompareRow('min7',  'var(--purple-lt)', 'var(--purple-txt)','Minor 7',     'Broods, smooth. Soul, funk, jazz.') +
       '</div>' +
-      '<div class="fund-callout"><strong>The key distinction:</strong> Dom7 vs Maj7 differ by just one semitone — m7 (10) vs M7 (11). Don\'t confuse them.</div>' +
+      '<div class="fund-callout"><strong>The key distinction:</strong> Dom7 vs Maj7 differ by just one semitone: m7 (10) vs M7 (11). Don\'t confuse them.</div>' +
     '</div>' +
 
     '<div class="fund-lesson-card">' +
-      '<div class="fund-eyebrow">Tap a root — all three 7th types</div>' +
+      '<div class="fund-eyebrow">Tap a root to compare all three 7th types</div>' +
       chordsRootSelector(5) +
       '<div id="chords-note-display">' + initDisplay + '</div>' +
     '</div>' +
@@ -36,7 +36,7 @@ function chordsStage5Study() {
 
 function chordsCompareRow(typeId, bgColor, textColor, label, desc) {
   var type   = chordTypeById(typeId);
-  var formula = type.degreeLabels.join(' – ');
+  var formula = type.degreeLabels.join('-');
   return '<div style="display:flex;align-items:center;gap:10px;background:' + bgColor + ';border-radius:8px;padding:10px 12px;">' +
     '<div style="flex:1;">' +
       '<div style="font-size:13px;font-weight:700;color:' + textColor + ';">' + label + ' &nbsp;<span style="font-size:11px;font-weight:600;opacity:0.8;">' + formula + '</span></div>' +

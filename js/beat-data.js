@@ -111,21 +111,21 @@ var BEAT_TOUR_SLIDES = [
   {
     icon: '🥁',
     title: 'Why timing matters',
-    body: 'Most beginners who "can’t keep time" have never had the beat made visible and physical. This module shows you the pulse — then puts it in your hands.'
+    body: 'Most beginners who "can’t keep time" have never had the beat made visible and physical. This module shows you the pulse, then puts it in your hands.'
   },
   {
     icon: '\u{1F45F}',
     title: 'The foot-tap',
-    body: 'This is your pulse, made visible. <b>Copper</b> on the beat, <b>silver</b> on the off-beat. Try tapping along right now — spacebar, click, or tap the screen.'
+    body: 'This is your pulse, made visible. <b>Copper</b> on the beat, <b>silver</b> on the off-beat. Try tapping along right now: spacebar, click, or tap the screen.'
   },
   {
     icon: '➕',
     title: 'Subdivision',
-    body: 'Every beat can split into smaller pieces — two eighth notes, four sixteenths. You’ll learn to feel and count those splits, not just the main beat.'
+    body: 'Every beat can split into smaller pieces: two eighth notes, four sixteenths. You’ll learn to feel and count those splits, not just the main beat.'
   },
   {
     icon: '\u{1F3B8}',
     title: 'From beat to strum',
-    body: 'Once the pulse and its subdivisions feel automatic, you’ll apply them directly to real strumming patterns — down and up strokes, right in time.'
+    body: 'Once the pulse and its subdivisions feel automatic, you’ll apply them directly to real strumming patterns: down and up strokes, right in time.'
   }
 ];

@@ -17,13 +17,13 @@ function fundStage1Study() {
     '<div class="fund-lesson-card">' +
       '<div class="fund-eyebrow">Stage 1 \u00B7 The Notes</div>' +
       '<div class="fund-title">7 notes. They loop forever.</div>' +
-      '<div class="fund-body">Music uses just <strong>7 letter names</strong>: A B C D E F G. When you reach G, you don\u2019t stop \u2014 you go back to A, now one octave higher. That cycle is everything. Every scale, every chord, every key is built from these same 7 names.</div>' +
+      '<div class="fund-body">Music uses just <strong>7 letter names</strong>: A B C D E F G. When you reach G, you don\u2019t stop. You go back to A, now one octave higher. That cycle is everything. Every scale, every chord, every key is built from these same 7 names.</div>' +
     '</div>' +
 
     '<div class="fund-string-diagram">' +
       '<div class="fund-string-label">Low E string \u00B7 Natural notes only</div>' +
       '<div class="fund-string-wrap">' + fundBuildStringSVG() + '</div>' +
-      '<div class="fund-callout" style="margin-top:10px;"><strong>Notice:</strong> E\u2192F is one fret. B\u2192C is one fret. Every other natural note is two frets apart. Those two gaps show up everywhere \u2014 learn to spot them now.</div>' +
+      '<div class="fund-callout" style="margin-top:10px;"><strong>Notice:</strong> E\u2192F is one fret. B\u2192C is one fret. Every other natural note is two frets apart. Those two gaps show up everywhere. Learn to spot them now.</div>' +
     '</div>' +
 
     '<div class="fund-section-divider"><span>Tap any note to see what comes next</span></div>' +
@@ -133,10 +133,10 @@ function fundPingAlpha(note) {
   /* No "step" language here \u2014 whole/half steps aren't introduced until Stage 2,
      and E\u2192F / B\u2192C are half steps while the rest are whole steps, so a blanket
      "up one step" was actively wrong for half of these pairs. */
-  if (msg) msg.textContent = 'After ' + note + ' comes ' + next + (note === 'G' ? ' \u2014 back to A (one octave up)' : '');
+  if (msg) msg.textContent = 'After ' + note + ' comes ' + next + (note === 'G' ? ', back to A (one octave up)' : '');
 
   setTimeout(function() {
     if (noteEl) noteEl.classList.remove('active');
     if (msg) msg.textContent = 'The cycle repeats every 7 notes';
-  }, 1800);
+  }, 4000);
 }

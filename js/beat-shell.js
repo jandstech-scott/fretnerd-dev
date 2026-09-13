@@ -204,7 +204,7 @@ function beatShowTempoPopup(newBpm, onDismiss) {
       '<div style="font-size:40px;margin-bottom:8px;">\u{1F3AF}</div>' +
       '<div style="font-size:19px;font-weight:800;color:var(--text);margin-bottom:8px;">Tempo up!</div>' +
       '<div style="font-size:14px;color:var(--text2);line-height:1.55;margin-bottom:20px;">' +
-        'You’re holding the beat steady — nice work. Moving up to <b style="color:var(--text);">' + newBpm + ' BPM</b>. ' +
+        'You’re holding the beat steady, nice work. Moving up to <b style="color:var(--text);">' + newBpm + ' BPM</b>. ' +
         'It’ll keep getting a little faster each time you lock in a tempo, all the way up to 120 BPM.' +
       '</div>' +
       '<button class="fund-cta-btn" style="margin:0;" onclick="beatDismissTempoPopup()">Let’s go →</button>' +

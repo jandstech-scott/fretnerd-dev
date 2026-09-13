@@ -11,7 +11,7 @@ function chordsStage4Study() {
     '<div class="fund-lesson-card">' +
       '<div class="fund-eyebrow">Stage 4 · Dominant 7th</div>' +
       '<div class="fund-title">Major chord + a flatted 7th on top.</div>' +
-      '<div class="fund-body">Take a major chord and add one more note: a <strong>Minor 7th</strong> (10 semitones above the root). That\'s a dominant 7th chord. The flatted 7th creates tension — it wants to resolve. Blues, jazz, and most popular music are built on this sound.</div>' +
+      '<div class="fund-body">Take a major chord and add one more note: a <strong>Minor 7th</strong> (10 semitones above the root). That\'s a dominant 7th chord. The flatted 7th creates tension: it wants to resolve. Blues, jazz, and most popular music are built on this sound.</div>' +
     '</div>' +
 
     '<div class="fund-lesson-card">' +
@@ -37,11 +37,11 @@ function chordsStage4Study() {
           '<div style="font-size:9px;color:var(--text3);margin-top:1px;">Min 7th</div>' +
         '</div>' +
       '</div>' +
-      '<div class="fund-callout">G7 = G – B – D – F. The F is 10 semitones above G. It\'s one semitone <em>below</em> the natural 7th (F♯).</div>' +
+      '<div class="fund-callout">G7 = G-B-D-F. The F is 10 semitones above G. It\'s one semitone <em>below</em> the natural 7th (F♯).</div>' +
     '</div>' +
 
     '<div class="fund-lesson-card">' +
-      '<div class="fund-eyebrow">Tap a root — major vs dom7</div>' +
+      '<div class="fund-eyebrow">Tap a root to compare major vs. dom7</div>' +
       chordsRootSelector(4) +
       '<div id="chords-note-display">' + initDisplay + '</div>' +
     '</div>' +

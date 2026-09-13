@@ -533,7 +533,7 @@ function renderQuestion() {
   var subTxt = kn.f === 0 ? 'open string' : '(' + STRING_NAMES[kn.s] + ')';
   if (isPhonePortrait()) {
     var zb = phoneZoneBounds(kn.f);
-    subTxt += '  ·  zone ' + zb.lo + '–' + zb.hi;
+    subTxt += '  ·  zone ' + zb.lo + '-' + zb.hi;
   }
   setText('prompt-sub', subTxt);
 
@@ -635,7 +635,7 @@ function handleAnswer(chosen, correct, correctIdx, kn) {
     currentStreak = 0; kn.wrong++; kn.streak = 0;
     kn.score = Math.max(0, kn.score - 1);
     kn.due   = Date.now() + 8000;
-    if (fb) { fb.style.color = '#993C1D'; fb.textContent = '✗ It\'s ' + correct + ' (' + eSec + 's) — string ' + (kn.s + 1) + ', fret ' + kn.f; }
+    if (fb) { fb.style.color = '#993C1D'; fb.textContent = '✗ It\'s ' + correct + ' (' + eSec + 's), string ' + (kn.s + 1) + ', fret ' + kn.f; }
     lastRevealNote = correct; lastRevealWrong = true;
     renderPracticeFretboard(kn, correct, true);
   }
@@ -662,7 +662,7 @@ function updateTopBar() {
     var tot = activeTotal();
     var e   = el('mastered-pill');
     setText('s-asked',   totalAsked);
-    setText('s-acc',     totalAsked > 0 ? Math.round(totalCorrect / totalAsked * 100) + '%' : '—');
+    setText('s-acc',     totalAsked > 0 ? Math.round(totalCorrect / totalAsked * 100) + '%' : '-');
     setText('s-streak',  currentStreak);
     if (e) e.innerHTML  = '<b>' + m + '</b>/' + tot;
     setStyle('prog-fill','width', Math.round(m / Math.max(1, tot) * 100) + '%');
@@ -675,7 +675,7 @@ function updateSpeedLegend() {
     var f  = T_FAST() / 1000;
     var sl = T_SLOW() / 1000;
     setText('leg-fast',     'fast (<' + f + 's)');
-    setText('leg-slow',     'slow (' + f + '–' + sl + 's)');
+    setText('leg-slow',     'slow (' + f + '-' + sl + 's)');
     setText('leg-hesitant', 'wrong/hesitant (>' + sl + 's)');
   } catch(err) {}
 }
@@ -863,7 +863,7 @@ function onFretMax(el2) {
   updateFretDisplay();
 }
 function updateFretDisplay() {
-  setText('fret-range-lbl', pendingFretMin + ' – ' + pendingFretMax);
+  setText('fret-range-lbl', pendingFretMin + '-' + pendingFretMax);
   setText('fret-min-num',   pendingFretMin);
   setText('fret-max-num',   pendingFretMax);
 }
@@ -912,7 +912,7 @@ function buildSettingsSummary() {
   if (practiceFretMin === 0 && practiceFretMax === MAX_FRET) {
     parts.push('Full neck');
   } else {
-    parts.push('Frets ' + practiceFretMin + '–' + practiceFretMax);
+    parts.push('Frets ' + practiceFretMin + '-' + practiceFretMax);
   }
   var hasN = accHasNaturals(accidentalMode), hasS = accHasSharps(accidentalMode), hasF = accHasFlats(accidentalMode);
   if (hasN && hasS && hasF)        parts.push('All notes');
@@ -930,7 +930,7 @@ function showPracticeIdle() {
   setHtml('prompt-sub', buildSettingsSummary()
     + '<br><span style="font-size:14px;">Tap ' + HINT_SVG + ' to change settings</span>');
   var db = el('diff-badge'); if (db) { db.textContent = ''; db.className = 'badge'; }
-  var tv = el('timer-val'); if (tv) { tv.textContent = '—'; tv.className = ''; }
+  var tv = el('timer-val'); if (tv) { tv.textContent = '-'; tv.className = ''; }
   var ar = el('answer-row'); if (ar) ar.innerHTML = '';
   var fb = el('feedback');   if (fb) fb.textContent = '';
   /* show a Start button inside the practice content */
@@ -978,9 +978,9 @@ function showStats() {
   var pool = notePool();
   setText('stats-title',   'Stats');
   setText('sv-asked',      totalAsked);
-  setText('sv-acc',        totalAsked > 0 ? Math.round(totalCorrect / totalAsked * 100) + '%' : '—');
+  setText('sv-acc',        totalAsked > 0 ? Math.round(totalCorrect / totalAsked * 100) + '%' : '-');
   setText('sv-mastered',   m + '/' + tot);
-  setText('sv-avg',        totalAsked > 0 ? (totalTime / totalAsked / 1000).toFixed(1) + 's' : '—');
+  setText('sv-avg',        totalAsked > 0 ? (totalTime / totalAsked / 1000).toFixed(1) + 's' : '-');
 
   var weak = Object.values(knowledge)
     .filter(function(k){ return k.seen && (k.wrong > 0 || (k.attempts > 0 && k.avgTime > T_FAST())); })
@@ -1045,8 +1045,8 @@ function showCompletion() {
   var expIdx   = expOrder.indexOf(expLevel);
 
   setText('co-asked', totalAsked);
-  setText('co-acc',   totalAsked > 0 ? Math.round(totalCorrect / totalAsked * 100) + '%' : '—');
-  setText('co-avg',   totalAsked > 0 ? (totalTime / totalAsked / 1000).toFixed(1) + 's' : '—');
+  setText('co-acc',   totalAsked > 0 ? Math.round(totalCorrect / totalAsked * 100) + '%' : '-');
+  setText('co-avg',   totalAsked > 0 ? (totalTime / totalAsked / 1000).toFixed(1) + 's' : '-');
   setText('complete-title', 'Practice set complete!');
   setText('complete-sub',   'All ' + tot + ' positions mastered at ' + EXP[expLevel].label + ' level.');
 
@@ -1190,17 +1190,17 @@ var TOUR_SLIDES = [
   {
     icon: '🤓',
     title: 'Welcome to Fretboard Notes',
-    body: 'You\'re looking at <b>Study mode</b> — the full fretboard with every note in your current range. Use <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="vertical-align:middle;margin:0 1px"><line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/><circle cx="7" cy="5" r="2" fill="var(--surface)"/><circle cx="13" cy="10" r="2" fill="var(--surface)"/><circle cx="7" cy="15" r="2" fill="var(--surface)"/></svg> to filter by string and fret. Here\'s how the module works.'
+    body: 'You\'re looking at <b>Study mode</b>: the full fretboard with every note in your current range. Use <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="vertical-align:middle;margin:0 1px"><line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/><circle cx="7" cy="5" r="2" fill="var(--surface)"/><circle cx="13" cy="10" r="2" fill="var(--surface)"/><circle cx="7" cy="15" r="2" fill="var(--surface)"/></svg> to filter by string and fret. Here\'s how the module works.'
   },
   {
     icon: '📖',
     title: 'Start with Study Mode',
-    body: 'Tap <b>Study</b> to see all the notes laid out on the neck. Use <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="vertical-align:middle;margin:0 1px"><line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/><circle cx="7" cy="5" r="2" fill="var(--surface)"/><circle cx="13" cy="10" r="2" fill="var(--surface)"/><circle cx="7" cy="15" r="2" fill="var(--surface)"/></svg> to filter by string and fret range. Focus on a small area first — don\'t try to memorize the whole neck at once.'
+    body: 'Tap <b>Study</b> to see all the notes laid out on the neck. Use <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="vertical-align:middle;margin:0 1px"><line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/><circle cx="7" cy="5" r="2" fill="var(--surface)"/><circle cx="13" cy="10" r="2" fill="var(--surface)"/><circle cx="7" cy="15" r="2" fill="var(--surface)"/></svg> to filter by string and fret range. Focus on a small area first, and don\'t try to memorize the whole neck at once.'
   },
   {
     icon: '⚡',
     title: 'Practice Mode & Smart Repetition',
-    body: 'Tap <b>Practice</b> to start drilling with spaced repetition — notes you struggle with come back sooner. <b>Speed matters:</b> fast answers build mastery faster. Wrong answers come back immediately.'
+    body: 'Tap <b>Practice</b> to start drilling with spaced repetition. Notes you struggle with come back sooner. <b>Speed matters:</b> fast answers build mastery faster. Wrong answers come back immediately.'
   },
   {
     icon: '🎯',

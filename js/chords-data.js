@@ -32,7 +32,7 @@ function chordNotes(root, formula) {
 }
 
 function chordDN(n) { return n.replace('b', '♭').replace('#', '♯'); }
-function chordDisplayNotes(notes) { return notes.map(chordDN).join(' – '); }
+function chordDisplayNotes(notes) { return notes.map(chordDN).join(' - '); }
 
 function chordSymbol(root, typeId) {
   var sfx = { major:'', minor:'m', dom7:'7', maj7:'maj7', min7:'m7' };
@@ -98,17 +98,17 @@ var CHORD_STAGE_CONFIG = {
 
 var CHORD_MASTERY_COPY = {
   1: { title:'Intervals locked in.',
-       body:'Minor 3rd, Major 3rd, Perfect 5th — the distances that build every chord. Next: how they stack to make a major chord.' },
+       body:'Minor 3rd, Major 3rd, Perfect 5th: the distances that build every chord. Next: how they stack to make a major chord.' },
   2: { title:'Major chords. All 12 roots.',
-       body:'R–M3–P5, every key, automatic. Next: flatten that middle note by one half step — same shape, completely different sound.' },
+       body:'R-M3-P5, every key, automatic. Next: flatten that middle note by one half step for the same shape, completely different sound.' },
   3: { title:'Major and minor. Solid.',
        body:'One half step of difference, completely different feel. Next: add a flatted 7th on top and you get the chord that drives blues, jazz, and most of popular music.' },
   4: { title:'Dominant 7ths. All 12.',
-       body:'R–M3–P5–m7. That tension in the top note is what makes it want to resolve. Next: swap the flatted 7th for a natural one — a very different mood.' },
+       body:'R-M3-P5-m7. That tension in the top note is what makes it want to resolve. Next: swap the flatted 7th for a natural one for a very different mood.' },
   5: { title:'All three 7th types. Done.',
        body:'Dom7 pulls. Maj7 floats. Min7 broods. One more stage: all 5 types mixed until the recognition is truly automatic.' },
   6: { title:'Five chord types. Automatic.',
-       body:'Major, minor, dom7, maj7, min7 — notes and formulas, any root, no hesitation. That’s chord construction. Module 04 puts them on the neck.' }
+       body:'Major, minor, dom7, maj7, min7: notes and formulas, any root, no hesitation. That’s chord construction. Module 04 puts them on the neck.' }
 };
 
 function chordActiveConfig() { return CHORD_STAGE_CONFIG[CHORD_QUIZ.stage]; }
@@ -352,9 +352,9 @@ function chordGenNameChord(root, typeId) {
 
 function chordGenFormulaRecall(typeId) {
   var type = chordTypeById(typeId);
-  var correct = type.degreeLabels.join('–');
+  var correct = type.degreeLabels.join('-');
   var distTypes = chordShuffle(CHORD_TYPES.filter(function(t) { return t.id !== typeId; })).slice(0,3);
-  var distractors = distTypes.map(function(t) { return t.degreeLabels.join('–'); });
+  var distractors = distTypes.map(function(t) { return t.degreeLabels.join('-'); });
   return {
     typeIdx:2, typeLabel:'Formula recall',
     prompt: 'What is the formula for a ' + type.name.toLowerCase() + ' chord?',

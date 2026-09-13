@@ -20,7 +20,7 @@ function beatStage4Study() {
     '<div class="fund-lesson-card">' +
       '<div class="fund-eyebrow">Stage 4 · Strum in Time</div>' +
       '<div class="fund-title">Put the pulse in your strumming hand</div>' +
-      '<div class="fund-body">↓ = downstroke, ↑ = upstroke. Watch which arrows light up on the beat vs. the "and" — the foot-tap pulse never stops underneath, on guitar or bass.</div>' +
+      '<div class="fund-body">↓ = downstroke, ↑ = upstroke. Watch which arrows light up on the beat vs. the "and." The foot-tap pulse never stops underneath, on guitar or bass.</div>' +
     '</div>' +
     '<div style="display:flex;gap:6px;margin:4px 0;">' + patternBtns + '</div>' +
     beatBuildFootWidget({ showTicks: false, showMeasure: false }) +

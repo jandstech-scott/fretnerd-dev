@@ -81,7 +81,9 @@ FUND_QUIZ.constructionSelections = [];
 FUND_QUIZ.usedPoolIndices = [];
 
 function fundRenderConstructionQuestion(c, headerHtml, q) {
-  FUND_QUIZ.constructionSelections = [];
+  /* the root (slot 0) is given away in the prompt itself, so it starts
+     pre-filled and non-interactive; the player only places the rest */
+  FUND_QUIZ.constructionSelections = [q.correctSequence[0]];
   FUND_QUIZ.usedPoolIndices = [];
 
   c.innerHTML =
@@ -100,19 +102,18 @@ function fundRenderConstructionQuestion(c, headerHtml, q) {
 function fundRenderConstructSlots(q) {
   var slots = '';
   var formula = (q.constructionType === 'minorScale') ? FUND_MINOR_SCALE_FORMULA : FUND_MAJOR_SCALE_FORMULA;
-  /* formula has 7 steps for 7 scale degrees — one between each pair, plus one
-     more leading back to the octave root, so it must render alongside every
-     slot (not just the gaps between them) or the pattern shows one step short. */
+  /* correctSequence now runs root..octave (8 notes), so 7 connectors between
+     them covers the full W/H formula. Slot 0 (the given root) has no tap
+     handler — it's not part of the puzzle, just shown for reference. */
   for (var i = 0; i < q.correctSequence.length; i++) {
     var filled = FUND_QUIZ.constructionSelections[i];
-    var tapAttr = (filled !== undefined) ? (' onclick="fundClearConstructionSlot(' + i + ')"') : '';
+    var tapAttr = (i !== 0 && filled !== undefined) ? (' onclick="fundClearConstructionSlot(' + i + ')"') : '';
     slots += '<div class="fq-construct-slot ' + (filled ? 'filled' : '') + (i === 0 ? ' root-slot' : '') + '"' + tapAttr + '>' + (filled || '') + '</div>';
-    var isHalf = formula[i] === 1;
-    slots += '<div class="fq-formula-connector ' + (isHalf ? 'half' : 'whole') + '">' + (isHalf ? 'H' : 'W') + '</div>';
+    if (i < q.correctSequence.length - 1) {
+      var isHalf = formula[i] === 1;
+      slots += '<div class="fq-formula-connector ' + (isHalf ? 'half' : 'whole') + '">' + (isHalf ? 'H' : 'W') + '</div>';
+    }
   }
-  /* decorative octave echo of the root — completes the pattern visually,
-     not part of the puzzle (not in correctSequence, never tappable) */
-  slots += '<div class="fq-construct-slot filled root-slot" style="opacity:0.55;">' + q.correctSequence[0] + '</div>';
   return slots;
 }
 
@@ -144,7 +145,8 @@ function fundNextOpenSlotIndex(q) {
 function fundRefreshConstructionUI(q) {
   el('fqConstructSlots').innerHTML = fundRenderConstructSlots(q);
   el('fqConstructPool').innerHTML = fundRenderConstructPool(q);
-  el('fqConstructUndo').disabled = (fundFilledSlotCount() === 0);
+  /* count of 1 just means the given root is filled — nothing real to undo yet */
+  el('fqConstructUndo').disabled = (fundFilledSlotCount() <= 1);
   el('fqConstructSubmit').disabled = (fundFilledSlotCount() !== q.correctSequence.length);
 }
 
@@ -162,6 +164,7 @@ function fundPickConstructionNote(note, poolIdx) {
 function fundClearConstructionSlot(slotIdx) {
   var q = FUND_QUIZ.current;
   if (FUND_QUIZ.answered) return;
+  if (slotIdx === 0) return; /* the given root isn't part of the puzzle */
   if (FUND_QUIZ.constructionSelections[slotIdx] === undefined) return;
   FUND_QUIZ.constructionSelections[slotIdx] = undefined;
   FUND_QUIZ.usedPoolIndices[slotIdx] = undefined;
@@ -172,7 +175,7 @@ function fundUndoConstructionNote() {
   var q = FUND_QUIZ.current;
   if (FUND_QUIZ.answered) return;
   var lastFilled = -1;
-  for (var i = 0; i < q.correctSequence.length; i++) {
+  for (var i = 1; i < q.correctSequence.length; i++) { /* skip slot 0, the given root */
     if (FUND_QUIZ.constructionSelections[i] !== undefined) lastFilled = i;
   }
   if (lastFilled === -1) return;
@@ -203,10 +206,11 @@ function fundSubmitConstruction() {
     var picked = FUND_QUIZ.constructionSelections[j];
     var isRight = (picked === correctNote);
     slotsHtml += '<div class="fq-construct-slot filled ' + (isRight ? 'right' : 'wrong') + (j === 0 ? ' root-slot' : '') + '">' + picked + (!isRight ? ('<span class="fq-construct-correction">' + correctNote + '</span>') : '') + '</div>';
-    var isHalf2 = revealFormula[j] === 1;
-    slotsHtml += '<div class="fq-formula-connector ' + (isHalf2 ? 'half' : 'whole') + '">' + (isHalf2 ? 'H' : 'W') + '</div>';
+    if (j < q.correctSequence.length - 1) {
+      var isHalf2 = revealFormula[j] === 1;
+      slotsHtml += '<div class="fq-formula-connector ' + (isHalf2 ? 'half' : 'whole') + '">' + (isHalf2 ? 'H' : 'W') + '</div>';
+    }
   }
-  slotsHtml += '<div class="fq-construct-slot filled root-slot" style="opacity:0.55;">' + q.correctSequence[0] + '</div>';
   el('fqConstructSlots').innerHTML = slotsHtml;
 
   var poolBtns = document.querySelectorAll('.fq-construct-pool-note');
@@ -222,10 +226,10 @@ function fundSubmitConstruction() {
   if (correct) {
     var secs = (timeMs / 1000).toFixed(1);
     html = wasSlow
-      ? '<span class="fq-fb-slow">\u2713 Correct (' + secs + 's) \u2014 getting there, not automatic yet</span>'
-      : '<span class="fq-fb-correct">\u2713 Correct (' + secs + 's)' + (FUND_QUIZ.consecutiveCorrect >= 3 ? (' \u2014 ' + FUND_QUIZ.consecutiveCorrect + ' in a row') : '') + '</span>';
+      ? '<span class="fq-fb-slow">\u2713 Correct (' + secs + 's), getting there, not automatic yet</span>'
+      : '<span class="fq-fb-correct">\u2713 Correct (' + secs + 's)' + (FUND_QUIZ.consecutiveCorrect >= 3 ? (', ' + FUND_QUIZ.consecutiveCorrect + ' in a row') : '') + '</span>';
   } else {
-    html = '<span class="fq-fb-wrong">\u2717 Not quite \u2014 corrections shown above.</span>';
+    html = '<span class="fq-fb-wrong">\u2717 Not quite: corrections shown above.</span>';
   }
 
   if (unlocked) {
@@ -274,12 +278,12 @@ function fundAnswerQuestion(choice) {
   if (correct) {
     var secs = (timeMs / 1000).toFixed(1);
     html = wasSlow
-      ? '<span class="fq-fb-slow">\u2713 Correct (' + secs + 's) \u2014 getting there, not automatic yet</span>'
-      : '<span class="fq-fb-correct">\u2713 Correct (' + secs + 's)' + (FUND_QUIZ.consecutiveCorrect >= 3 ? (' \u2014 ' + FUND_QUIZ.consecutiveCorrect + ' in a row') : '') + '</span>';
+      ? '<span class="fq-fb-slow">\u2713 Correct (' + secs + 's), getting there, not automatic yet</span>'
+      : '<span class="fq-fb-correct">\u2713 Correct (' + secs + 's)' + (FUND_QUIZ.consecutiveCorrect >= 3 ? (', ' + FUND_QUIZ.consecutiveCorrect + ' in a row') : '') + '</span>';
   } else {
     var answerLabel = acceptable.length > 1 ? acceptable.join(' or ') : q.correct;
     var penaltyMsg = FUND_QUIZ.consecutiveCorrect === 0 ? 'No streak to lose yet.' : ('Back to ' + FUND_QUIZ.consecutiveCorrect + '.');
-    html = '<span class="fq-fb-wrong">\u2717 Not quite \u2014 it\u2019s <strong>' + answerLabel + '</strong>. ' + penaltyMsg + '</span>';
+    html = '<span class="fq-fb-wrong">\u2717 Not quite: it\u2019s <strong>' + answerLabel + '</strong>. ' + penaltyMsg + '</span>';
   }
 
   if (unlocked) {
@@ -329,7 +333,7 @@ function fundRenderUnlockIntroScreen(typeIdx) {
       '<div style="font-size:30px;margin-bottom:8px;">\u{1F513}</div>' +
       '<div class="fund-eyebrow" style="justify-content:center;">New question type</div>' +
       '<div class="fund-title" style="font-size:20px;">' + cfg.typeLabels[typeIdx] + '</div>' +
-      '<div class="fund-body" style="margin-top:6px;">You\u2019re doing well enough to add a new format into the mix. Here\u2019s what it looks like \u2014 take your time, no clock running yet.</div>' +
+      '<div class="fund-body" style="margin-top:6px;">You\u2019re doing well enough to add a new format into the mix. Here\u2019s what it looks like: take your time, no clock running yet.</div>' +
     '</div>' +
     '<div class="fq-shell" style="opacity:0.85;">' +
       '<div class="fq-prompt-row">' +
@@ -337,9 +341,9 @@ function fundRenderUnlockIntroScreen(typeIdx) {
         '<div class="fq-badge-col"><div class="fq-type-badge">' + preview.typeLabel + '</div></div>' +
       '</div>' +
       '<div class="fq-answers">' + optionsHtml + '</div>' +
-      '<div class="fq-feedback" style="color:var(--text2);">This is just a preview \u2014 nothing to tap here.</div>' +
+      '<div class="fq-feedback" style="color:var(--text2);">This is just a preview: nothing to tap here.</div>' +
     '</div>' +
-    '<button class="fund-cta-btn" onclick="fundConfirmUnlock()">Got it \u2014 continue \u2192</button>';
+    '<button class="fund-cta-btn" onclick="fundConfirmUnlock()">Got it, continue \u2192</button>';
 }
 
 function fundConfirmUnlock() {
@@ -359,7 +363,7 @@ function fundRenderSpeedNudgeScreen() {
   c.innerHTML =
     '<div class="fund-lesson-card" style="text-align:center;padding:24px 20px;">' +
       '<div style="font-size:30px;margin-bottom:8px;">\u23F1</div>' +
-      '<div class="fund-eyebrow" style="justify-content:center;">You know this \u2014 it\u2019s just not automatic yet</div>' +
+      '<div class="fund-eyebrow" style="justify-content:center;">You know this, but it\u2019s not automatic yet</div>' +
       '<div class="fund-body" style="margin-top:6px;">You\u2019re getting them right, but averaging ' + avgSecs + 's. A few more rounds and this should start feeling automatic.</div>' +
     '</div>' +
     '<button class="fund-cta-btn" onclick="fundContinueDrilling()">Keep drilling \u2192</button>';

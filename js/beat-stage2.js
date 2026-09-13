@@ -21,7 +21,7 @@ function beatStage2Study() {
     '<div class="fund-lesson-card">' +
       '<div class="fund-eyebrow">Stage 2 · Subdivide</div>' +
       '<div class="fund-title">Split the beat into smaller pieces</div>' +
-      '<div class="fund-body">The small teal ticks are subdivisions of the main beat — two eighth notes, or four sixteenths, fit inside every foot-tap. The beat counter shows how beats group under each time signature.</div>' +
+      '<div class="fund-body">The small teal ticks are subdivisions of the main beat: two eighth notes, or four sixteenths, fit inside every foot-tap. The beat counter shows how beats group under each time signature.</div>' +
     '</div>' +
     '<div style="display:flex;gap:6px;margin:4px 0;">' + sigBtns + '</div>' +
     '<div style="display:flex;gap:6px;margin-bottom:4px;">' + subBtns + '</div>' +
@@ -49,7 +49,7 @@ function beatStage2Practice() {
       '<div class="fq-prompt-row">' +
         '<div>' +
           '<div class="fq-question">Tap every ' + subLabel + ' note</div>' +
-          '<div class="fq-sub">Not just the main beat — every subdivision tick.</div>' +
+          '<div class="fq-sub">Not just the main beat: every subdivision tick.</div>' +
         '</div>' +
         '<div class="fq-badge-col">' +
           '<div class="fq-type-badge" id="beatTapCountReadout">0 / ' + beatSession.rollingWindowSize + '</div>' +

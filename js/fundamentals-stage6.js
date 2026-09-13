@@ -19,12 +19,12 @@ function fundStage6Study() {
     '<div class="fund-lesson-card">' +
       '<div class="fund-eyebrow">Stage 6 \u00B7 Natural Minor Scales</div>' +
       '<div class="fund-title">Same notes. Different home.</div>' +
-      '<div class="fund-body">Every relative minor you learned in Stage 5 has its own scale \u2014 and you already know it. It\u2019s the same 7 notes as its major key, just starting from a different note. ' + majorKey.displayKey + ' major and ' + majorKey.displayRelativeMinor + ' minor share every note. Only which one feels like \u201Chome\u201D changes.</div>' +
+      '<div class="fund-body">Every relative minor you learned in Stage 5 has its own scale, and you already know it. It\u2019s the same 7 notes as its major key, just starting from a different note. ' + majorKey.displayKey + ' major and ' + majorKey.displayRelativeMinor + ' minor share every note. Only which one feels like \u201Chome\u201D changes.</div>' +
     '</div>' +
 
     '<div class="fund-lesson-card">' +
       '<div class="fund-eyebrow">Two Formulas, Same Notes</div>' +
-      '<div class="fund-body" style="margin-bottom:14px;">Major and natural minor use different formulas. Starting from their own root, they land on the same 7 pitches \u2014 just in a different order.</div>' +
+      '<div class="fund-body" style="margin-bottom:14px;">Major and natural minor use different formulas. Starting from their own root, they land on the same 7 pitches, just in a different order.</div>' +
       '<div class="fund-formula-compare-label">Major</div>' +
       '<div class="fund-formula-row" style="margin:6px 0 16px;">' +
         '<div class="fund-formula-step whole">W</div><div class="fund-formula-step whole">W</div>' +
@@ -39,10 +39,10 @@ function fundStage6Study() {
         '<div class="fund-formula-step half">H</div><div class="fund-formula-step whole">W</div>' +
         '<div class="fund-formula-step whole">W</div>' +
       '</div>' +
-      '<div class="fund-body" style="font-size:13px;margin-top:4px;">Notice the half steps land in different places \u2014 that\u2019s what gives minor its different character, even using the same notes as its relative major.</div>' +
+      '<div class="fund-body" style="font-size:13px;margin-top:4px;">Notice the half steps land in different places: that\u2019s what gives minor its different character, even using the same notes as its relative major.</div>' +
     '</div>' +
 
-    '<div class="fund-section-divider"><span>Try it \u2014 pick a minor key</span></div>' +
+    '<div class="fund-section-divider"><span>Try it: pick a minor key</span></div>' +
 
     '<div class="fund-lesson-card">' +
       '<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:10px;">' + keyBtns + '</div>' +
@@ -50,7 +50,7 @@ function fundStage6Study() {
       '<div class="fund-minor-major-link" id="fundMinorMajorLink">' + fundRenderMinorMajorLink(majorKey) + '</div>' +
     '</div>' +
 
-    '<div class="fund-callout"><strong>Same key signature, both directions.</strong> Whatever sharps or flats belong to a major key belong to its relative minor too \u2014 you already know every minor key\u2019s signature from Stage 4, you just didn\u2019t know it yet.</div>' +
+    '<div class="fund-callout"><strong>Same key signature, both directions.</strong> Whatever sharps or flats belong to a major key belong to its relative minor too. You already know every minor key\u2019s signature from Stage 4, you just didn\u2019t know it yet.</div>' +
 
     '<button class="fund-cta-btn" onclick="fundStartPractice(6)">Start Practice \u2192</button>'
   );
@@ -71,7 +71,7 @@ function fundBuildMinorScaleBuilderHTML(majorKey) {
 function fundRenderMinorMajorLink(majorKey) {
   return '<div style="font-size:12px;color:var(--text2);text-align:center;line-height:1.6;">' +
     '<strong style="color:var(--text);">' + majorKey.displayRelativeMinor + ' minor</strong> is the relative minor of ' +
-    '<strong style="color:var(--text);">' + majorKey.displayKey + ' major</strong> \u2014 ' +
+    '<strong style="color:var(--text);">' + majorKey.displayKey + ' major</strong>: ' +
     majorKey.scale.join(' ') + ', starting from ' + majorKey.displayRelativeMinor + ' instead of ' + majorKey.displayKey + '.' +
   '</div>';
 }

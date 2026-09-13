@@ -13,7 +13,7 @@ function beatStage1Study() {
     '<div class="fund-lesson-card">' +
       '<div class="fund-eyebrow">Stage 1 · Find the Pulse</div>' +
       '<div class="fund-title">Feel the beat before you play it</div>' +
-      '<div class="fund-body">Watch the foot tap a steady quarter-note pulse. <b>Copper</b> means "the beat" — <b>silver</b> means the space between beats, the "and." Don’t tap yet — just watch and count along in your head: 1, 2, 3, 4.</div>' +
+      '<div class="fund-body">Watch the foot tap a steady quarter-note pulse. <b>Copper</b> means "the beat." <b>Silver</b> means the space between beats, the "and." Don’t tap yet. Just watch and count along in your head: 1, 2, 3, 4.</div>' +
     '</div>' +
     beatBuildFootWidget({ showTicks: false, showMeasure: false }) +
     '<div style="display:flex;justify-content:center;margin:8px 0;">' +
@@ -41,7 +41,7 @@ function beatStage1Practice() {
       '<div class="fq-prompt-row">' +
         '<div>' +
           '<div class="fq-question">Tap the beat</div>' +
-          '<div class="fq-sub">Spacebar, click, or tap the zone below — right on the copper beat.</div>' +
+          '<div class="fq-sub">Spacebar, click, or tap the zone below, right on the copper beat.</div>' +
         '</div>' +
         '<div class="fq-badge-col">' +
           '<div class="fq-type-badge" id="beatTapCountReadout">0 / ' + beatSession.rollingWindowSize + '</div>' +
@@ -61,14 +61,14 @@ function beatStage1Practice() {
 var BEAT_TAP_FEEDBACK_LABELS = {
   onTime: 'On time!', early: 'A touch early', late: 'A touch late',
   missed: 'Missed', wrongDir: 'Wrong direction',
-  tooFar: 'Between beats — wait for the next one', extra: 'Already counted that beat'
+  tooFar: 'Between beats, wait for the next one', extra: 'Already counted that beat'
 };
 
 function beatShowLastTapFeedback(result) {
   var el1 = document.getElementById('beatLastTapFeedback');
   if (!el1) return;
   if (result === null || result === undefined) {
-    el1.textContent = 'Hang on — count-in still running';
+    el1.textContent = 'Hang on, count-in still running';
     el1.className = 'beat-last-tap beat-last-tap--wait';
     return;
   }

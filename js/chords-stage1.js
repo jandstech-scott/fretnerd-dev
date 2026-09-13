@@ -18,7 +18,7 @@ function chordsStage1Study() {
       '<div class="fund-eyebrow">Stage 1 · Intervals</div>' +
       '<div class="fund-title">Five distances. Every chord is built from these.</div>' +
       '<div class="fund-body">A chord is just notes stacked at specific distances from the root. Those distances are called <strong>intervals</strong>. Learn to hear and name these five and you can build any chord from scratch.</div>' +
-      '<div class="fund-body" style="margin-top:8px;">On guitar, 1 semitone = 1 fret. So every interval is a fixed number of frets — the same distance anywhere on the neck, regardless of starting note.</div>' +
+      '<div class="fund-body" style="margin-top:8px;">On guitar, 1 semitone = 1 fret. So every interval is a fixed number of frets: the same distance anywhere on the neck, regardless of starting note.</div>' +
     '</div>' +
 
     '<div class="fund-lesson-card">' +
@@ -37,7 +37,7 @@ function chordsStage1Study() {
 
     '<div class="fund-lesson-card">' +
       '<div class="fund-eyebrow">Calculating intervals on one string</div>' +
-      '<div class="fund-body">Pick any note on any string. Count up that many frets — <em>on the same string</em> — and you\'ve found the interval note. The string doesn\'t matter. The starting fret doesn\'t matter. Only the count matters.</div>' +
+      '<div class="fund-body">Pick any note on any string. Count up that many frets (<em>on the same string</em>) and you\'ve found the interval note. The string doesn\'t matter. The starting fret doesn\'t matter. Only the count matters.</div>' +
       '<div style="margin:14px 0;">' +
         chordsIntervalFretDiagram() +
       '</div>' +
@@ -45,7 +45,7 @@ function chordsStage1Study() {
     '</div>' +
 
     '<div class="fund-lesson-card">' +
-      '<div class="fund-eyebrow">Worked example — starting from A (5th fret, low E)</div>' +
+      '<div class="fund-eyebrow">Worked example: starting from A (5th fret, low E)</div>' +
       '<div style="display:flex;flex-direction:column;gap:6px;margin:8px 0;">' +
         chordsWorkedExample('A', [
           { label:'+ 3 frets (m3)', result:'C',  note:'8th fret' },
@@ -53,7 +53,7 @@ function chordsStage1Study() {
           { label:'+ 7 frets (P5)', result:'E',  note:'12th fret' }
         ]) +
       '</div>' +
-      '<div style="font-size:12px;color:var(--text3);margin-top:8px;">A – C – E = A minor. A – C♯ – E = A major. The only difference is one fret on the middle note — that\'s coming in Stage 3.</div>' +
+      '<div style="font-size:12px;color:var(--text3);margin-top:8px;">A-C-E = A minor. A-C♯-E = A major. The only difference is one fret on the middle note, and that\'s coming in Stage 3.</div>' +
     '</div>' +
 
     '<button class="fund-cta-btn" onclick="chordsStartPractice(1)">Start Practice →</button>'

@@ -57,7 +57,7 @@ function fundStage4Page1() {
     '<div class="fund-lesson-card">' +
       '<div class="fund-eyebrow">Stage 4 \u00B7 Page 1 of 3</div>' +
       '<div class="fund-title">One formula. Twelve keys.</div>' +
-      '<div class="fund-body">A <strong>scale</strong> is a sequence of 7 notes, built from a pattern of whole and half steps. A <strong>key</strong> is that scale used as your home base \u2014 the notes and chords that feel like they belong together. Keys come in different flavors: major, minor, and others, each with its own step pattern. We\u2019ll start with major, the most common starting point. Every major key\u2019s scale is built the exact same way: start on any note and apply the pattern of whole and half steps you already know.</div>' +
+      '<div class="fund-body">A <strong>scale</strong> is a sequence of 7 notes, built from a pattern of whole and half steps. A <strong>key</strong> is that scale used as your home base: the notes and chords that feel like they belong together. Keys come in different flavors: major, minor, and others, each with its own step pattern. We\u2019ll start with major, the most common starting point. Every major key\u2019s scale is built the exact same way: start on any note and apply the pattern of whole and half steps you already know.</div>' +
     '</div>' +
 
     '<div class="fund-lesson-card">' +
@@ -71,7 +71,7 @@ function fundStage4Page1() {
       '<div class="fund-body" style="text-align:center;font-size:14px;">Apply this pattern from any starting note and you get that note\u2019s major scale.</div>' +
     '</div>' +
 
-    '<div class="fund-section-divider"><span>Try it \u2014 pick a root</span></div>' +
+    '<div class="fund-section-divider"><span>Try it: pick a root</span></div>' +
 
     '<div class="fund-lesson-card">' +
       '<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:10px;">' + keyBtns + '</div>' +
@@ -114,7 +114,7 @@ function fundStage4Page2() {
     '<div class="fund-lesson-card">' +
       '<div class="fund-eyebrow">Stage 4 \u00B7 Page 2 of 3</div>' +
       '<div class="fund-title">Read the signature off the scale.</div>' +
-      '<div class="fund-body">You don\u2019t need to memorize which sharps belong to which key \u2014 they\u2019re sitting right there in the scale you build. Here\u2019s ' + key.displayKey + ' major. Tap the notes that <strong>aren\u2019t natural</strong>.</div>' +
+      '<div class="fund-body">You don\u2019t need to memorize which sharps belong to which key. They\u2019re sitting right there in the scale you build. Here\u2019s ' + key.displayKey + ' major. Tap the notes that <strong>aren\u2019t natural</strong>.</div>' +
     '</div>' +
     '<div class="fund-lesson-card">' +
       '<div id="fundReadSigScale" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;">' + fundRenderReadSigScale(key) + '</div>' +
@@ -161,8 +161,8 @@ function fundCheckReadSig() {
 
   var fb = el('fundReadSigFeedback');
   fb.innerHTML = gotItRight
-    ? '<span class="fq-fb-correct">\u2713 Exactly right \u2014 ' + key.accidentals.join(' and ') + ' is ' + key.displayKey + ' major\u2019s whole key signature.</span>'
-    : '<span class="fq-fb-slow">Close \u2014 the accidentals are ' + key.accidentals.join(' and ') + '. Everything else stays natural.</span>';
+    ? '<span class="fq-fb-correct">\u2713 Exactly right: ' + key.accidentals.join(' and ') + ' is ' + key.displayKey + ' major\u2019s whole key signature.</span>'
+    : '<span class="fq-fb-slow">Close: the accidentals are ' + key.accidentals.join(' and ') + '. Everything else stays natural.</span>';
 
   fundStage4UnlockNext();
 }
@@ -186,7 +186,7 @@ function fundStage4Page3() {
     '<div class="fund-lesson-card">' +
       '<div class="fund-eyebrow">Stage 4 \u00B7 Page 3 of 3</div>' +
       '<div class="fund-title">Key signatures, two ways.</div>' +
-      '<div class="fund-body">Same information, two views. The list reads top to bottom \u2014 each key keeps everything above it and adds one more. The circle shows why it never really stops: it\u2019s a loop, not a line.</div>' +
+      '<div class="fund-body">Same information, two views. The list reads top to bottom: each key keeps everything above it and adds one more. The circle shows why it never really stops: it\u2019s a loop, not a line.</div>' +
     '</div>' +
     '<div class="fund-sig-tab-row">' +
       '<button class="fund-sig-tab-btn ' + (fundStage4SigTab === 'list' ? 'active' : '') + '" onclick="fundSwitchSigTab(\'list\')">List</button>' +
@@ -216,9 +216,9 @@ function fundRenderListTab() {
         '<div id="fundSigTableFlats">' + fundRenderSigTable(FUND_FLAT_TABLE_KEYS, 'flat') + '</div>' +
       '</div>' +
     '</div>' +
-    '<div class="fund-callout"><strong>Notice it stops at 6.</strong> F# major (6 sharps) and G\u266d major (6 flats) are enharmonic twins \u2014 the same pitches, two spellings. Flip to the Circle tab to see why they meet at the bottom.</div>' +
+    '<div class="fund-callout"><strong>Notice it stops at 6.</strong> F# major (6 sharps) and G\u266d major (6 flats) are enharmonic twins: the same pitches, two spellings. Flip to the Circle tab to see why they meet at the bottom.</div>' +
     '<div class="fund-lesson-card">' +
-      '<div class="fund-eyebrow">Quick check \u2014 read the table directly</div>' +
+      '<div class="fund-eyebrow">Quick check: read the table directly</div>' +
       '<div class="fund-body" style="font-size:13px;margin-bottom:8px;">Get all 6 right to unlock Start Practice below.</div>' +
       '<div id="fundStage4DrillArea">' + fundRenderDrillQuestion() + '</div>' +
     '</div>'
@@ -228,7 +228,7 @@ function fundRenderListTab() {
 function fundRenderCircleTab() {
   return (
     '<div class="fund-lesson-card">' +
-      '<div class="fund-body">Same 12 keys, arranged as a loop instead of a list. Going clockwise from C adds one sharp at a time. Going counter-clockwise adds one flat at a time. They meet at the bottom \u2014 F# and its enharmonic twin, Gb, sitting at the exact same spot.</div>' +
+      '<div class="fund-body">Same 12 keys, arranged as a loop instead of a list. Going clockwise from C adds one sharp at a time. Going counter-clockwise adds one flat at a time. They meet at the bottom: F# and its enharmonic twin, Gb, sitting at the exact same spot.</div>' +
     '</div>' +
     '<div class="fund-lesson-card">' +
       '<div style="display:flex;justify-content:center;padding:8px 0;">' + fundBuildCircleSVG() + '</div>' +
@@ -254,7 +254,7 @@ function fundRenderSigTable(rootList, accType) {
       }
       accCells = parts.join(' ');
     } else {
-      accCells = '<span class="fund-sig-table-acc none">\u2014</span>';
+      accCells = '<span class="fund-sig-table-acc none">-</span>';
     }
     html += '<div class="fund-sig-table-row">' +
       '<div class="fund-sig-table-pos">' + i + '</div>' +
@@ -292,7 +292,7 @@ function fundRenderDrillQuestion() {
   fundStage4DrillAnswered = false;
   var q = fundStage4DrillQuestion;
   var optHtml = q.options.map(function(opt) {
-    return '<button class="fund-predict-option' + (opt.length > 6 ? ' long-text' : '') + '" onclick="fundAnswerDrill(\'' + opt + '\')">' + opt + '</button>';
+    return '<button class="fund-predict-option" onclick="fundAnswerDrill(\'' + opt + '\')">' + opt + '</button>';
   }).join('');
   return '<div class="fund-drill-progress">Reading the table: ' + fundStage4DrillCorrectCount + '/' + FUND_STAGE4_DRILL_TARGET + '</div>' +
     '<div class="fund-predict-question">' + q.prompt + '</div>' +
@@ -318,7 +318,7 @@ function fundAnswerDrill(choice) {
     fundStage4DrillCorrectCount++;
     fb.innerHTML = '<span class="fq-fb-correct">\u2713 Right off the table.</span>';
   } else {
-    fb.innerHTML = '<span class="fq-fb-wrong">Not quite \u2014 find its row above and check again.</span>';
+    fb.innerHTML = '<span class="fq-fb-wrong">Not quite: find its row above and check again.</span>';
   }
   fb.innerHTML += '<button class="fq-continue-btn" onclick="fundNextDrillQuestion()">Continue \u2192</button>';
 }

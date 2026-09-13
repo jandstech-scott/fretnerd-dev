@@ -103,27 +103,27 @@ var FUND_STAGE_CONFIG = {
 var FUND_MASTERY_COPY = {
   1: {
     title: 'Fast and correct. Locked in.',
-    body: 'You\u2019ve got the musical alphabet down cold \u2014 accurate and automatic. Next: the two distances behind every scale and chord \u2014 whole steps and half steps.'
+    body: 'You\u2019ve got the musical alphabet down cold, accurate and automatic. Next: the two distances behind every scale and chord: whole steps and half steps.'
   },
   2: {
     title: 'Fast and correct. Locked in.',
-    body: 'Whole steps and half steps are automatic now. Next: the notes that sit between the natural ones \u2014 sharps, flats, and how they\u2019re spelled.'
+    body: 'Whole steps and half steps are automatic now. Next: the notes that sit between the natural ones: sharps, flats, and how they\u2019re spelled.'
   },
   3: {
     title: 'Fast and correct. Locked in.',
-    body: 'Sharps, flats, and enharmonic spellings are automatic now. Next: keys and key signatures \u2014 how those 12 pitches organize into the major scales you\u2019ll actually play.'
+    body: 'Sharps, flats, and enharmonic spellings are automatic now. Next: keys and key signatures: how those 12 pitches organize into the major scales you\u2019ll actually play.'
   },
   4: {
     title: 'All 12 keys. Locked in.',
-    body: 'Every major key, built from the same formula, fast and accurate. Stage 5 — the Circle of Fifths — is next.'
+    body: 'Every major key, built from the same formula, fast and accurate. Stage 5, the Circle of Fifths, is next.'
   },
   5: {
     title: 'The whole map. Locked in.',
-    body: 'Every relationship on the circle, every relative minor, fast and accurate. One more piece: minor scales themselves \u2014 what those relative minors actually sound like.'
+    body: 'Every relationship on the circle, every relative minor, fast and accurate. One more piece: minor scales themselves, what those relative minors actually sound like.'
   },
   6: {
     title: 'Minor scales. Locked in.',
-    body: 'Major and minor, built from the same notes, different starting point. That\u2019s the full foundation \u2014 every other module builds on what you just learned.'
+    body: 'Major and minor, built from the same notes, different starting point. That\u2019s the full foundation: every other module builds on what you just learned.'
   }
 };
 
@@ -273,7 +273,7 @@ function fundGenType1() {
   return {
     typeIdx: 1,
     typeLabel: 'Fill the gap',
-    prompt: seq.join(' \u2013 '),
+    prompt: seq.join('-'),
     sub: 'Which note is missing?',
     options: options,
     correct: correct
@@ -560,16 +560,22 @@ function fundS4GenBuildTheScale() {
 
   var decoys = [];
   for (var d in decoySet) if (decoySet.hasOwnProperty(d)) decoys.push(d);
-  var pool = fundShuffle(key.scale.concat(decoys));
+
+  /* The root (degree 1) is given away in the prompt itself, so it's pre-filled
+     and non-interactive. The pool covers degrees 2-7 plus one more tile for
+     the octave (degree 8, same spelling as the root) — the player has to
+     recognize the scale wraps back to the root, not have it handed to them. */
+  var openNotes = key.scale.slice(1).concat([key.scale[0]]);
+  var pool = fundShuffle(openNotes.concat(decoys));
 
   return {
     typeIdx: 0,
     typeLabel: 'Build the scale',
     constructionType: 'scale',
     prompt: 'Build the ' + key.displayKey + ' major scale',
-    sub: 'Tap notes in order, applying W-W-H-W-W-W-H from the root',
+    sub: 'Root is given. Tap the rest in order, applying W-W-H-W-W-W-H',
     pool: pool,
-    correctSequence: key.scale,
+    correctSequence: key.scale.concat([key.scale[0]]),
     keyRoot: key.root
   };
 }
@@ -586,7 +592,7 @@ function fundS4GenNameTheKey() {
   return {
     typeIdx: 1,
     typeLabel: 'Name the key',
-    prompt: rotated.join(' \u2013 '),
+    prompt: rotated.join('-'),
     sub: 'What major key is this? (notes shown out of order)',
     options: options,
     correct: key.displayKey + ' major',
@@ -773,16 +779,21 @@ function fundS6GenBuildMinorScale() {
 
   var decoys = [];
   for (var d in decoySet) if (decoySet.hasOwnProperty(d)) decoys.push(d);
-  var pool = fundShuffle(minorScale.concat(decoys));
+
+  /* same treatment as the major-scale builder: the root is given away in the
+     prompt, so the player fills in degrees 2-7 plus the octave repeat of the
+     root themselves, instead of getting the octave handed to them for free. */
+  var openNotes = minorScale.slice(1).concat([minorScale[0]]);
+  var pool = fundShuffle(openNotes.concat(decoys));
 
   return {
     typeIdx: 0,
     typeLabel: 'Build the minor scale',
     constructionType: 'minorScale',
     prompt: 'Build the ' + majorKey.displayRelativeMinor + ' minor scale',
-    sub: 'Tap notes in order, applying W-H-W-W-H-W-W from the root',
+    sub: 'Root is given. Tap the rest in order, applying W-H-W-W-H-W-W',
     pool: pool,
-    correctSequence: minorScale,
+    correctSequence: minorScale.concat([minorScale[0]]),
     keyRoot: majorKey.root
   };
 }
@@ -800,7 +811,7 @@ function fundS6GenNameMinorScale() {
   return {
     typeIdx: 1,
     typeLabel: 'Name the minor scale',
-    prompt: rotated.join(' \u2013 '),
+    prompt: rotated.join('-'),
     sub: 'What natural minor scale is this? (notes shown out of order)',
     options: options,
     correct: correct,

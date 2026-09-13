@@ -464,7 +464,7 @@ function triadsHelpContent() {
 
     '<div class="fund-lesson-card" style="margin:0;">' +
       '<div class="fund-eyebrow">Inversions</div>' +
-      '<div class="fund-body">Three notes, three ways to stack them. Which note sits lowest on the neck defines the inversion — and determines the shape.</div>' +
+      '<div class="fund-body">Three notes, three ways to stack them. Which note sits lowest on the neck defines the inversion, and determines the shape.</div>' +
       '<div style="display:flex;flex-direction:column;gap:5px;margin-top:10px;">' +
         invRow(TRIAD_COLOR_ROOT,  'Root position', 'Root is lowest') +
         invRow(TRIAD_COLOR_THIRD, '1st inversion', '3rd is lowest') +

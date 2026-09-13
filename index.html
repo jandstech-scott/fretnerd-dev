@@ -86,7 +86,7 @@
       <div class="module-icon">05</div>
       <div class="module-info">
         <div class="module-name">Scale Patterns</div>
-        <div class="module-desc">CAGED, pentatonic, modes — own every pattern on every position.</div>
+        <div class="module-desc">CAGED, pentatonic, modes: own every pattern on every position.</div>
       </div>
       <div class="module-badge badge-soon">Coming soon</div>
     </div>
@@ -166,7 +166,7 @@
     <div class="pill"><b id="s-asked">0</b> asked</div>
     <div id="stats-practice-pills">
       <span class="stats-divider"></span>
-      <div class="pill"><b id="s-acc">—</b> acc</div>
+      <div class="pill"><b id="s-acc">-</b> acc</div>
       <div class="pill"><b id="s-streak">0</b> streak</div>
     </div>
     <div class="pill" id="mastered-pill"><b id="s-mastered">0</b>/126</div>
@@ -205,7 +205,7 @@
   <div id="practice-content" style="display:flex;flex:1;flex-direction:column;gap:var(--gap);min-height:0;">
     <div id="prompt-row">
       <div id="prompt-left">
-        <div id="prompt-text">—</div>
+        <div id="prompt-text">-</div>
         <div id="prompt-sub"></div>
       </div>
       <div class="badge" id="diff-badge"></div>
@@ -296,15 +296,15 @@
     <div class="sec-lbl" id="exp-lbl">Experience level</div>
     <div class="exp-card" id="mc-beginner"     onclick="selectExp('beginner')">
       <div class="exp-card-title">Beginner</div>
-      <div class="exp-card-desc">Confident &lt;10s · Slow 10–20s · 3 to master</div>
+      <div class="exp-card-desc">Confident &lt;10s · Slow 10-20s · 3 to master</div>
     </div>
     <div class="exp-card" id="mc-intermediate" onclick="selectExp('intermediate')">
       <div class="exp-card-title">Intermediate</div>
-      <div class="exp-card-desc">Confident &lt;5s · Slow 5–12s · 4 to master</div>
+      <div class="exp-card-desc">Confident &lt;5s · Slow 5-12s · 4 to master</div>
     </div>
     <div class="exp-card" id="mc-expert"       onclick="selectExp('expert')">
       <div class="exp-card-title">Expert</div>
-      <div class="exp-card-desc">Confident &lt;3s · Slow 3–6s · 5 to master</div>
+      <div class="exp-card-desc">Confident &lt;3s · Slow 3-6s · 5 to master</div>
     </div>
 
     <div class="panel-actions action-row">
@@ -327,9 +327,9 @@
     </div>
     <div class="sp-stats">
       <div class="sp-stat"><div class="sp-stat-val" id="sv-asked">0</div><div class="sp-stat-lbl">asked</div></div>
-      <div class="sp-stat"><div class="sp-stat-val" id="sv-acc">—</div><div class="sp-stat-lbl">accuracy</div></div>
+      <div class="sp-stat"><div class="sp-stat-val" id="sv-acc">-</div><div class="sp-stat-lbl">accuracy</div></div>
       <div class="sp-stat"><div class="sp-stat-val" id="sv-mastered">0</div><div class="sp-stat-lbl">mastered</div></div>
-      <div class="sp-stat"><div class="sp-stat-val" id="sv-avg">—</div><div class="sp-stat-lbl">avg time</div></div>
+      <div class="sp-stat"><div class="sp-stat-val" id="sv-avg">-</div><div class="sp-stat-lbl">avg time</div></div>
     </div>
     <div class="sec-lbl">Knowledge map</div>
     <canvas id="hm2-canvas" style="display:block;width:100%;border-radius:6px;" height="90"></canvas>
@@ -360,9 +360,9 @@
     <div style="font-size:22px;font-weight:700;margin-bottom:0.4rem;color:var(--text);" id="complete-title">Done!</div>
     <div style="font-size:14px;color:var(--text2);margin-bottom:1.5rem;" id="complete-sub"></div>
     <div class="sp-stats" style="grid-template-columns:repeat(3,1fr);">
-      <div class="sp-stat"><div class="sp-stat-val" id="co-asked">—</div><div class="sp-stat-lbl">asked</div></div>
-      <div class="sp-stat"><div class="sp-stat-val" id="co-acc">—</div><div class="sp-stat-lbl">accuracy</div></div>
-      <div class="sp-stat"><div class="sp-stat-val" id="co-avg">—</div><div class="sp-stat-lbl">avg time</div></div>
+      <div class="sp-stat"><div class="sp-stat-val" id="co-asked">-</div><div class="sp-stat-lbl">asked</div></div>
+      <div class="sp-stat"><div class="sp-stat-val" id="co-acc">-</div><div class="sp-stat-lbl">accuracy</div></div>
+      <div class="sp-stat"><div class="sp-stat-val" id="co-avg">-</div><div class="sp-stat-lbl">avg time</div></div>
     </div>
     <div id="complete-actions"></div>
   </div>

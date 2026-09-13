@@ -10,7 +10,7 @@ function chordsStage2Study() {
   return (
     '<div class="fund-lesson-card">' +
       '<div class="fund-eyebrow">Stage 2 · Major Chords</div>' +
-      '<div class="fund-title">Root – Major 3rd – Perfect 5th.</div>' +
+      '<div class="fund-title">Root, Major 3rd, Perfect 5th.</div>' +
       '<div class="fund-body">Every major chord is built the same way: start on the root, go up a <strong>Major 3rd</strong> (4 semitones), then up a <strong>Perfect 5th</strong> (7 semitones) from the root. Three notes. Same formula, 12 different starting points.</div>' +
     '</div>' +
 

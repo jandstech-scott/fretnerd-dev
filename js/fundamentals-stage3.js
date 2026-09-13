@@ -41,7 +41,7 @@ function fundStage3Study() {
     '<div class="fund-lesson-card">' +
       '<div class="fund-eyebrow">Stage 3 \u00B7 Sharps, Flats &amp; Enharmonics</div>' +
       '<div class="fund-title">The notes between the notes.</div>' +
-      '<div class="fund-body">You already know a half step is the smallest gap between two pitches \u2014 one fret. Between most natural notes sits another pitch, exactly one half step away. Call it a <strong>sharp (\u266F)</strong> going up, a <strong>flat (\u266D)</strong> going down. Same fret, same sound, different name depending on direction.</div>' +
+      '<div class="fund-body">You already know a half step is the smallest gap between two pitches: one fret. Between most natural notes sits another pitch, exactly one half step away. Call it a <strong>sharp (\u266F)</strong> going up, a <strong>flat (\u266D)</strong> going down. Same fret, same sound, different name depending on direction.</div>' +
     '</div>' +
 
     '<div class="fund-string-diagram">' +
@@ -59,7 +59,7 @@ function fundStage3Study() {
 
     '<div class="fund-lesson-card">' +
       '<div class="fund-eyebrow">Enharmonic Equivalents</div>' +
-      '<div class="fund-body" style="margin-bottom:10px;">Same pitch, two names. Which spelling you use depends on the key you\u2019re in \u2014 not the sound itself.</div>' +
+      '<div class="fund-body" style="margin-bottom:10px;">Same pitch, two names. Which spelling you use depends on the key you\u2019re in, not the sound itself.</div>' +
       '<div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">' +
         '<div style="text-align:center;"><div class="fund-enharm-pill" id="sharpPill">' + pair.sharp + '</div><div style="font-size:13px;color:var(--text2);margin-top:4px;font-weight:600;">sharp spelling</div></div>' +
         '<div style="font-size:20px;font-weight:700;color:var(--text3);">=</div>' +
@@ -71,17 +71,17 @@ function fundStage3Study() {
       '<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:10px;">' + pickerHtml + '</div>' +
     '</div>' +
 
-    '<div class="fund-callout"><strong>E\u2013F and B\u2013C have no sharp/flat between them.</strong> You\u2019ve already seen why \u2014 they\u2019re the two half-step pairs in the natural alphabet.</div>' +
+    '<div class="fund-callout"><strong>E-F and B-C have no sharp/flat between them.</strong> You\u2019ve already seen why: they\u2019re the two half-step pairs in the natural alphabet.</div>' +
 
     '<button class="fund-cta-btn" onclick="fundStartPractice(3)">Start Practice \u2192</button>'
   );
 }
 
 var FUND_CHROM_TIPS = {
-  'natural': function(n) { return n + ' is a natural note \u2014 one of the 7 letter names.'; },
+  'natural': function(n) { return n + ' is a natural note: one of the 7 letter names.'; },
   'acc': function(n) {
     var parts = n.split('/');
-    return parts[0] + ' and ' + parts[1] + ' are the same pitch \u2014 two names for one fret.';
+    return parts[0] + ' and ' + parts[1] + ' are the same pitch: two names for one fret.';
   }
 };
 

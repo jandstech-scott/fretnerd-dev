@@ -92,7 +92,7 @@ function beatStage3RenderQuestion() {
   if (BEAT_Q3.type === 2) {
     return header +
       beatBuildDotRow(BEAT_Q3.target.slots) +
-      '<div class="fund-body" style="text-align:center;">Tap along with the pulse — one tap for every filled dot.</div>' +
+      '<div class="fund-body" style="text-align:center;">Tap along with the pulse, one tap for every filled dot.</div>' +
       beatBuildFootWidget({ showTicks: false, showMeasure: false }) +
       '<div class="beat-tap-zone" id="beatTapZone3">TAP</div>' +
       '<div class="beat-last-tap" id="beatLastTapFeedback">&nbsp;</div>';
@@ -158,7 +158,7 @@ function beatStage3AnswerCount(chosen, idx) {
   var btn = document.getElementById('beatQ3Opt' + idx);
   if (btn) btn.classList.add(correct ? 'correct' : 'wrong');
   var fb = document.getElementById('beatQ3Feedback');
-  if (fb) fb.textContent = correct ? 'Correct!' : ('Not quite — it’s ' + BEAT_Q3.target.beats + ' beats.');
+  if (fb) fb.textContent = correct ? 'Correct!' : ('Not quite: it’s ' + BEAT_Q3.target.beats + ' beats.');
   beatPushDiscreteResult(correct);
   setTimeout(function() { beatStage3NextQuestion(); }, 900);
 }
@@ -170,7 +170,7 @@ function beatStage3AnswerIdentify(chosenId, idx) {
   var btn = document.getElementById('beatQ3Choice' + idx);
   if (btn) btn.classList.add(correct ? 'correct' : 'wrong');
   var fb = document.getElementById('beatQ3Feedback');
-  if (fb) fb.textContent = correct ? 'Correct!' : 'Not quite — listen closer next time.';
+  if (fb) fb.textContent = correct ? 'Correct!' : 'Not quite: listen closer next time.';
   beatPushDiscreteResult(correct);
   setTimeout(function() { beatStage3NextQuestion(); }, 900);
 }

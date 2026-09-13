@@ -459,7 +459,7 @@
     }
     .fq-construct-slot.root-slot { border-color: var(--teal); }
     .fq-construct-slot.filled { border-style: solid; color: var(--text); cursor: pointer; }
-    .fq-construct-slot.filled.root-slot { background: var(--teal); color: #fff; border-color: var(--teal); }
+    .fq-construct-slot.filled.root-slot { background: var(--teal); color: #fff; border-color: var(--teal); cursor: default; }
     .fq-construct-slot.right { background: var(--teal-lt); border-color: var(--teal); color: var(--teal-txt); }
     .fq-construct-slot.wrong { background: var(--red-lt); border-color: var(--red); color: var(--red-txt); }
     .fq-construct-correction {
@@ -523,10 +523,9 @@
     .fund-predict-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
     .fund-predict-option {
       padding: 14px 8px; border-radius: 8px; background: var(--bg); border: 1px solid var(--border);
-      color: var(--text); font-size: 15px; font-weight: 700; cursor: pointer; font-family: var(--font);
-      -webkit-appearance: none;
+      color: var(--text); font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font);
+      -webkit-appearance: none; line-height: 1.3;
     }
-    .fund-predict-option.long-text { font-size: 12px; }
     .fund-predict-option:disabled { cursor: default; }
     .fund-predict-option.correct-tap { background: var(--teal-lt); border-color: var(--teal); color: var(--teal-txt); }
     .fund-predict-option.wrong-tap { background: var(--red-lt); border-color: var(--red); color: var(--red-txt); }
